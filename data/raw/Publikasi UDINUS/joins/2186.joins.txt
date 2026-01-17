@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/2186/1388
+tanggal: 2018/11/28
+judul: Sistem Push Notification Life@BankJateng Sebagai Penunjang Layanan Pegawai PT. Bank Jawa Tengah Menggunakan Socket.IO
+keyword: Push Notification, Socket.IO, Realtime, web service, Mobile.
+abstrak: Sistem Push Notification Life@BankJateng merupakan sistem yang dirancang untuk melayani kepegawaian Bank Jawa Tengah. Sistem tersebut berupa aplikasi web sebagai admin dan aplikasi mobile sebagai client yang dapat memudahkan pertukaran informasi antar keduanya. Sistem Life@BankJateng dapat diakses menggunakan komputer, android dan IOS dan perangkat lain yang mendukungnya. Fitur-fitur yang disediakan bertujuan untuk memudahkan pengelolaan informasi karir. Fitur yang disediakan meliputi pengaksesan informasi berita terbaru, akses profil tentang pencapaian jabatan kerja, pengelolaan cuti, fasilitas kesehatan dan surat pengantar perjalanan dinas (SPPD) dan lain lain. Sebagai tambahannya sistem tersebut berjalan secara realtime dengan memanfaatkan library Socket.IO yang dapat memberikan pemberitahuan pesan khusus pada setiap pegawai yang telah terdaftar di database sistem. Sistem ini telah teruji kualitasnya dengan menggunakan pengujian black box testing dan white box testing.
+peneliti: Sinar Setyawan, Ajib Susanto

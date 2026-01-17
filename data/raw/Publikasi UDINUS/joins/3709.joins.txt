@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/3709/pdf
+tanggal: 2020/11/30
+judul: Pengelompokan Desa Menggunakan K-Means Untuk Penyelenggaraan Penanggulangan Bencana Banjir
+keyword: Clustering, Elbow, K-Means, Silhouette
+abstrak: Penyelenggaraan penanggulangan bencana merupakan suatu agenda kewajiban lembaga yang dinamakan BPBD. Perencanaan yang tidak terstruktur menyebabkan penentuan komponen didalamnya menjadi kurang optimal, seperti tempat, sumber daya manusia, transportasi. Penentuan tempat menjadi poin utama yang dapat mempengaruhi komponen lain dalam perencanaan. Ketersediaan data mengenai tempat berupa rekap desa rawan bencana dimiliki oleh bidang I Kesiapsiagaan Bencana. Dari rekap data kejadian dan profil desa dilakukan pengelompokan yang bertujuan untuk menemukan karakteristik yang dapat membantu dalam penentuan tempat kegiatan. Metode K-Means dipilih untuk memetakan desa sesuai karakteristik dengan jumlah cluster sesuai jumlah optimal yang lebih baik antara metode elbow dan silhouette. Dihasilkan clustering optimal dengan jumlah cluster 7 hasil penentuan nilai k dari metode elbow. Dengan ukuran pengelompokan Cluster 1 = 1 desa, Cluster 2 = 2 desa, Cluster 3 = 19 desa, Cluster 4 = 4 desa, Cluster 5 = 5 desa, Cluster 6 = 1 desa, Cluster 7 = 1 desa.
+peneliti: Shelladita Fitriyani Susilo, Asep Jamaludin, Intan Purnamasari

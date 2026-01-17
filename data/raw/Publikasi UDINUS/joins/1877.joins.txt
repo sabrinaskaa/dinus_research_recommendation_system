@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1877/1284
+tanggal: 2018/05/31
+judul: Implementasi Metode Naive Bayes Untuk Klasifikasi Kredit Motor
+keyword: DataMining, Algoritma Naive Bayes, Klasifikasi, Debitur.
+abstrak: Kredit dalam hal ini telah menjadi sumber penghasilan bagi beberapa bank ataupun perusahaan dan instansi swasta yang menyewakan jasa kreditnya kepada konsumen, meskipun begitu dapat dilihat terdapat beberapa konsumen yang memiliki kredit macet seperti tunggakan dan hal lainnya yang mengakibatkan tidak dapat melanjutkan pembayaran kredit. OTO Kredit Motor adalah salah satu perusahaan yang bergerak dibidang perkreditan kendaraan beroda dua atau motor. Dalam hal ini OTO Kredit Motor masih sangat kesulitan di dalam menentukan calon debitur yang nantinya akan layak untuk mendapatkan kredit tersebut. Oleh karena itu data mining digunakan untuk dapat memprediksi resiko terjadinya kredit macet dengan melakukan pengklasifikasian terhadap calon debitur kendaraan nantinya. Tujuan dari penelitian ini, adalah memprediksi terhadap kelayakan kredit macet menggunakan metode Naïve Bayes. Hasil dari penelitian digunakan untuk memprediksi kelayakan kredit untuk menghindarkan terjadinya kredit macet, dan mengevaluasi performance model Naïve Bayes.
+peneliti: Heryono Heryono, Acun Kardianawati

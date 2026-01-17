@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1173/883
+tanggal: 2016/06/17
+judul: Pengukuran Kinerja Pelayanan Implementasi Metode Fuzzy Time Series Terhadap Dampak Perubahan Harga Bahan Bakar Minyak pada Investasi Saham (Studi Peristiwa : Saham pada IHSG di Bursa Efek Indonesia)
+keyword: perubahan harga bahan bakar minyak, IHSG, fuzzy time series, soft computing, MAPE
+abstrak: Perubahan harga Bahan Bakar Minyak (BBM) merupakan salah satu faktor yang memengaruhi investasi saham pada Indeks Harga Saham Gabungan (IHSG) di Indonesia. Fluktuasi harga saham yang tidak menentu menuntut investor untuk lebih selektif dalam berinvestasi guna meminimalkan risiko bisnis. Oleh karena itu, proses peramalan (forecasting) pada data runtun waktu (time series) sangat dibutuhkan untuk mendukung pengambilan keputusan. Penelitian ini menerapkan metode Fuzzy Time Series, sebuah pendekatan soft computing, untuk memprediksi pergerakan data di pasar modal. Tujuan utama penerapan metode ini adalah menyediakan alternatif prediksi IHSG yang akurat. Hasil akhir dari penelitian ini berupa peramalan data kuantitatif untuk periode berikutnya, di mana tingkat akurasi model diukur dan divalidasi menggunakan nilai Mean Absolute Percentage Error (MAPE).
+peneliti: Budi Karyo Utomo, Wellia Shinta Sari

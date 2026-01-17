@@ -1,0 +1,6 @@
+url: https://journal.lppmunindra.ac.id/index.php/JOTI/article/download/26308/7560
+tanggal: 2025/03/30
+judul: Rancang Bangun Alat Bantu Hand Stacker Menggunakan Sistem Penggerak Electric Winch di PT. X
+keyword: Electric Winch, Hand Stacker, Material Manual Handling, QFD
+abstrak: Warehouse adalah fasilitas penyimpanan temporer untuk bahan baku, barang setengah jadi, dan produk jadi. Di PT. X, pekerja masih menggunakan metode manual handling untuk menyusun material ke rak, yang menyebabkan beban kerja berat dan kelelahan. Penelitian ini merancang alat bantu hand stacker dengan menggunakan metode Quality Function Deployment (QFD) untuk memenuhi kebutuhan pekerja. Perancangan alat dilakukan dengan software Autodesk Inventor. Hasilnya, hand stacker yang dirancang dapat mengangkat beban hingga 100 kg dan mencapai ketinggian 150 cm. Dimensi alat ini disesuaikan dengan ukuran tubuh pekerja, dengan tinggi rangka 2000 mm, lebar 780 mm, dan panjang 1590 mm. Setelah diuji dua kali, alat ini telah terbukti memenuhi spesifikasi dan lolos pada tahap pengujian.
+peneliti: Hendi Febrianto, Amirul Wicaksono, Arina Khusnah Khusnah, Rindra Yusianto

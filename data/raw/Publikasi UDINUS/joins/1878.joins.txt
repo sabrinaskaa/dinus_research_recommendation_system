@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1878/1285
+tanggal: 2018/05/31
+judul: Pemilihan Ojek Online Bagi Wanita Karir Menggunakan Analytic Hierarchy Process
+keyword: Sistem Penunjang Keputusan, Pemilihan Ojek Online, AHP
+abstrak: Penelitian ini bertujuan untuk mengetahui prioritas pilihan ojek online bagi wanita karir dengan menggunakan kriteria service, tarif, waktu tunggu, kemudahan dalam penggunaan aplikasi, promosi sebagai kriteria pemilihannya. Survey dilakukan dengan kuisioner bagi para wanita karir dan hasil survey dianalisa menggunakan Analytic Hierarchy Process (AHP) untuk mendapatkan keputusan prioritas pilihan. Hasil analisis menunjukan kriteria terpenting adalah promosi sebesar 42%, service sebesar 24%, kemudahan penggunaan aplikasi sebesar 17%, waktu tunggu sebesar 11% dan terakhir tarif sebesar 6%. Sedangkan untuk urutan prioritas ojek online diposisi teratas adalah GOJEK sebesar 43%, disusul GRAB 35% dan UBER 23%.
+peneliti: Fintri Indriyani

@@ -1,0 +1,4 @@
+use_sastrawi_stopwords: true
+use_domain_stopwords: true
+use_stemming: true
+stemming_mode: selective

@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1302/965
+tanggal: 2016/06/17
+judul: Penerapan Metode Clustering Dengan Algoritma K-Means Untuk Rekomendasi Pemilihan Jalur Peminatan Sesuai Kemampuan Pada Progam Studi Teknik Informatika - S1 Universitas Dian Nuswantoro
+keyword: Peminatan, Rekomendasi, Data Mining, Clustering, K-Means
+abstrak: Perubahan harga Bahan Bakar Minyak (BBM) merupakan salah satu faktor yang memengaruhi investasi saham pada Indeks Harga Saham Gabungan (IHSG) di Indonesia. Fluktuasi harga saham yang tidak menentu menuntut investor untuk lebih selektif dalam berinvestasi guna meminimalkan risiko bisnis. Oleh karena itu, proses peramalan (forecasting) pada data runtun waktu (time series) sangat dibutuhkan untuk mendukung pengambilan keputusan. Penelitian ini menerapkan metode Fuzzy Time Series, sebuah pendekatan soft computing, untuk memprediksi pergerakan data di pasar modal. Tujuan utama penerapan metode ini adalah menyediakan alternatif prediksi IHSG yang akurat. Hasil akhir dari penelitian ini berupa peramalan data kuantitatif untuk periode berikutnya, di mana tingkat akurasi model diukur dan divalidasi menggunakan nilai Mean Absolute Percentage Error (MAPE).
+peneliti: Rizky Adrianto, Amiq Fahmi

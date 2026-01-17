@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/audience/article/view/12352/5135
+tanggal: 2025/03/03
+judul: Analisis Klasifikasi Review Film Kang Mak from Pee Mak di Twitter dengan Algoritma Naïve Bayes
+keyword: Analisis klasifikasi; Elaboration Likelihood Model; Twitter; Ulasan Film
+abstrak: Twitter merupakan media sosial berbasis microblog yang tidak hanya interaktif, tetapi juga informatif. Salah satu informasinya adalah ulasan (Review) yang dilakukan oleh film “Kang Mak from Pee Mak” yang dilakukan oleh berbagai akun resmi dan pengguna Twitter itu sendiri sebagai bentuk strategi komunikasi pemasaran organik. Penelitian ini bertujuan untuk melihat tingkat akurasi pada klasifikasi central route dan peripheral route dalam perspektif ELM sebagai proses pengambilan keputusan terhadap pesan persuasif. Metode penelitian menggunakan machine learning dengan pendekatan algoritma Naïve Bayes pada software Orange Data Mining dengan fitur Test-Score dan Confusion Matrix. Hasil penelitian dari 558 tweets menunjukan bahwa tingkat akurasi pada central route dan peripheral route sebesar 63.6%. Proses pengambilan keputusan melalui jalur periferal menunjukkan angka F1-score sebesar 89.5%, dimana keputusan khalayak untuk menonton film berdasarkan informasi pengalaman menonton beserta informasi rating.
+peneliti: Kusariani Adinda Saraswati

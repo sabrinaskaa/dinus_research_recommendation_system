@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/12020/5103
+tanggal: 2025/02/26
+judul: Perbandingan Algoritma CNN, LSTM, FNN untuk Diagnosa Fibrosis Hati dengan Citra Medis
+keyword: Fibrosis hati, CNN, LSTM, FNN, klasifikasi citra medis.
+abstrak: Fibrosis hati merupakan kondisi yang berpotensi berkembang menjadi sirosis atau kanker hati jika tidak terdiagnosis dengan tepat. Prosedur biopsi hati yang invasif sering digunakan dalam diagnosis, namun memiliki risiko dan keterbatasan biaya. Penelitian ini bertujuan untuk membandingkan kinerja model deep learning, yaitu Convolutional Neural Network (CNN), Long Short-Term Memory (LSTM), dan Feedforward Neural Network (FNN) dalam klasifikasi fibrosis hati menggunakan citra medis.
+peneliti: Bagas Aji Febryanto, Imam Tahyudin

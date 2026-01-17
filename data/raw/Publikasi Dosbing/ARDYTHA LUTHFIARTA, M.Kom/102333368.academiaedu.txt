@@ -1,0 +1,6 @@
+url: https://www.academia.edu/download/102333368/1397.pdf
+tanggal: 2018/12/27
+judul: Pengenalan Pola Aksara Jawa Menggunakan Metode Korelasi Template Matching
+keyword: Aksara Jawa, OCR, Segmentasi, Korelasi Template Matching
+abstrak: Pada era modern ini, dampak globalisasi semakin masuk dan meluas ke sebagian besar masyarakat, di mana salah satu dampaknya adalah kecenderungan masyarakat untuk lebih memilih mempelajari dan menggunakan bahasa asing dibandingkan bahasa daerah, khususnya bahasa Jawa, sehingga hal ini sangat memengaruhi pengetahuan masyarakat terhadap keberadaan aksara Jawa, terutama di bidang pendidikan. Penelitian ini bertujuan untuk membuat sebuah aplikasi pengenalan tulisan aksara Jawa berbasis Optical Character Recognition (OCR), dengan metode pengenalan pola menggunakan korelasi template matching. Algoritma Template Matching bekerja dengan mencocokkan citra template dengan citra uji setelah melalui proses pra-pemrosesan dan segmentasi. Berdasarkan hasil penelitian yang telah dilakukan dengan menggunakan 10 template karakter dan 20 data pengujian, diperoleh tingkat akurasi sebesar 93,44% dan tingkat kesalahan sebesar 6,56%, sehingga dapat disimpulkan bahwa algoritma Template Matching mampu mengenali pola aksara Jawa dengan baik.
+peneliti: I Ferdiansyah Katili, F Dyah Esabella, Ardytha Luthfiarta

@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/12983/5496
+tanggal: 2025/08/18
+judul: Monitoring Dan Controlling Aktivitas Tidur Menggunakan Smart Belt Berbasis Internet of Things
+keyword: Posisi Tidur, Durasi Tidur, Sabuk Pintar, Internet of Things
+abstrak: Tidur adalah aktivitas penting untuk pemulihan energi, perbaikan sel, dan pengaturan hormon. Tidur yang nyenyak dan optimal bergantung pada posisi tidur yang nyaman dan durasi yang cukup. Namun, banyak orang yang masih mengabaikan faktor-faktor tersebut, sehingga mengakibatkan pengalaman tidur yang kurang nyenyak. Penelitian ini bertujuan untuk mengembangkan perangkat Smart Belt untuk memantau dan mengatur posisi dan durasi tidur dengan menggunakan sensor akselerometer dan sensor denyut jantung. Pengujian terdiri dari 30 uji coba deteksi posisi tidur, 30 pengukuran durasi tidur, dan 60 evaluasi sistem secara keseluruhan. Hasil penelitian menunjukkan bahwa sensor akselerometer dapat mengidentifikasi dan mendeteksi posisi tidur dengan akurasi 100%, sedangkan sensor denyut jantung menentukan durasi tidur berdasarkan denyut jantung dengan akurasi 83,33%. Secara keseluruhan, sistem Smart Belt beroperasi dengan akurasi 88,33%.
+peneliti: Gunawan, Rahmi Hidayati, Cucu Suhery

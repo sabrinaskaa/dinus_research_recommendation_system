@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1171/882
+tanggal: 2016/06/17
+judul: Pengukuran Kinerja Pelayanan Di Samsat Kota Semarang 1 Menggunakan COBIT 5 Dan Metode Persepsi Kualitas
+keyword: pengukuran kinerja pelayanan, COBIT 5, visi, misi, persepsi kualitas
+abstrak: SAMSAT Kota Semarang 1 merupakan unit pelayanan publik yang menangani administrasi kendaraan bermotor dengan visi mewujudkan pelayanan prima berbasis teknologi. Untuk mendukung visi tersebut, dilakukan pengukuran kinerja pelayanan yang mencakup dua perspektif, yaitu internal dan eksternal. Pengukuran internal menggunakan kerangka kerja COBIT 5 untuk menilai tingkat kapabilitas proses, di mana pemilihan proses didasarkan pada pemetaan visi dan misi SAMSAT. Proses yang dievaluasi meliputi domain DSS02, DSS03, dan EDM04. Sementara itu, pengukuran kinerja dari pihak eksternal (pelanggan) menggunakan metode persepsi kualitas untuk mengetahui tingkat kepuasan pelanggan dengan membandingkan antara harapan dan pengalaman layanan yang diterima. Hasil penelitian menunjukkan bahwa dari sisi internal, proses EDM04 berada pada level Defined Process, sedangkan proses DSS02 dan DSS03 mencapai level Predictable Process. Dari sisi eksternal, tingkat kepuasan pelanggan terhadap pelayanan SAMSAT dikategorikan Puas.
+peneliti: Adriana Dina, Indra Gamayanto

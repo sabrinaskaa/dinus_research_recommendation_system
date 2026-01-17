@@ -1,0 +1,6 @@
+url: https://abdimasku.lppm.dinus.ac.id/index.php/jurnalabdimasku/article/viewFile/1876/472
+tanggal: 2024/01/27
+judul: Optimasi Investasi di Pasar Saham Indonesia: Meningkatkan Keputusan Investasi dengan Prediksi IHSG menggunakan Decision Tree
+keyword: saham, investasi, ihsg, prediksi, decision tree, model, mos
+abstrak: Pasar saham Indonesia merupakan pilar ekonomi yang vital, memfasilitasi perolehan modal bagi perusahaan serta menawarkan peluang investasi bagi individu hingga korporasi besar. Keberhasilan investasi sangat dipengaruhi oleh kemampuan memahami faktor-faktor yang menentukan pergerakan harga saham. Teknologi dan analisis data, khususnya melalui algoritma Decision Tree, dapat membantu memprediksi pergerakan Indeks Harga Saham Gabungan (IHSG), sehingga mendukung pengambilan keputusan investasi yang lebih baik. Pengabdian masyarakat bertajuk “Optimasi Investasi di Pasar Saham Indonesia” dirancang untuk meningkatkan literasi investasi di kalangan mahasiswa, pengusaha, dan pemegang saham melalui pengembangan sistem analisis berbasis Decision Tree untuk prediksi IHSG. Program ini mencakup penelitian awal, pengembangan dan validasi model prediksi, pelatihan dan edukasi, serta implementasi.
+peneliti: Dwi Eko Waluyo, Cinantya Paramita, Hayu Wikan Kinasih, Fauzi Adi Rafrastara, Dewi Pergiwati

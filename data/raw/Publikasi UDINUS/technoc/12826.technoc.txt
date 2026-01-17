@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/12826/5504
+tanggal: 2025/08/18
+judul: Aplikasi Pengolahan Citra Digital Untuk Kebutuhan Absensi Karyawan Dengan Metode Euclidean Distance
+keyword: Face Recognition, Euclidean Distance, Python.
+abstrak: Penelitian ini bertujuan untuk merancang dan mengembangkan aplikasi pengolahan citra digital guna mendukung pencatatan jam kerja engineer secara efisien, khususnya pada Divisi HISD di PT Multipolar Technology. Aplikasi ini menggunakan metode Euclidean Distance dalam proses pengenalan wajah untuk kebutuhan absensi karyawan. Sistem dirancang agar dapat berfungsi secara optimal sebagai alat pengarsipan data lokal tanpa menimbulkan gangguan teknis maupun operasional. Selain itu, aplikasi ini diharapkan mampu menyediakan data yang andal untuk mendukung perhitungan KPI dan menganalisis beban kerja individu. Aplikasi dibangun menggunakan bahasa pemrograman Python dengan integrasi pustaka OpenCV, InsightFace, dan database Redis. Hasil pengujian menunjukkan bahwa sistem mampu mengenali wajah dengan akurat serta mempermudah proses pencatatan timesheet, sehingga dapat meningkatkan produktivitas dan pemantauan kinerja.
+peneliti: Ryan Kamil, Dian Nur Sholihaningtias , Eddy Saputra

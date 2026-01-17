@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1169/880
+tanggal: 2016/06/17
+judul: Prediksi Produksi Debit Air Minum Per Bulan Dengan Metode Jaringan Syaraf Tiruan Backpropagation ( Studi Kasus : PDAM Tirta Moedal Semarang )
+keyword: Jaringan Syaraf Tiruan, Backpropagation, Mean Squared Error, Prediksi, Matlab
+abstrak: PDAM Tirta Moedal Semarang, sebagai perusahaan penyedia air minum, masih menghadapi kendala dalam menyeimbangkan volume produksi air dengan kebutuhan konsumen. Akibatnya, sering terjadi produksi yang berlebihan (overproduction) dibandingkan dengan permintaan bulanan. Penelitian ini bertujuan untuk membantu PDAM Tirta Moedal Semarang dalam menyeimbangkan produksi air dengan permintaan konsumen menggunakan metode Jaringan Syaraf Tiruan (Neural Network) dengan algoritma Backpropagation. Data yang digunakan difokuskan pada rekapitulasi penggunaan air oleh pelanggan setiap bulan dan dianalisis menggunakan perangkat lunak Matlab 8.1.0. Berdasarkan hasil pelatihan, arsitektur jaringan terbaik diperoleh pada percobaan ke-2, dengan nilai Mean Squared Error (MSE) terkecil sebesar 3.531.665,852 dan persentase error sebesar 0,023%.
+peneliti: Monica Amadea, Agus Winarno

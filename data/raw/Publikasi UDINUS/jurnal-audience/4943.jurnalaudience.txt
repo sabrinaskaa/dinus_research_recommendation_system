@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/audience/article/view/4943/2525
+tanggal: 2021/10/05
+judul: Measuring Lifebuoy Ad Exposure in Building Awareness of KlikDokter Application Users during Pandemic COVID-19
+keyword: COVID-19; terpaan iklan; kesadaran merek; KlikDokter; Lifebouy; survei
+abstrak: Pandemi COVID-19 merupakan wabah penyakit yang membuat hampir seluruh manusia tidak dapat bebas bepergian terutama di Indonesia. Lifebouy dan KlikDokter sebagai salah satu produk kesehatan yang memiliki relevansi kuat terkait upaya preventif penyebaran virus di Indonesia menjadi fokus peneliti. Penelitian ini bertujuan untuk menganalisis terpaan Iklan Lifebouy dalam membangun kesadaran merek pengguna aplikasi KlikDokter di masa pandemi saat ini. Analisis data menggunakan IBM SPSS Statistics 26 dan melibatkan 107 sampel dengan menggunakan paradigma positivisme, pendekatan kuantitatif, metode survei, dan instrumen pengumpulan data berupa kuisioner. Hasil dari penelitian ini menunjukkan bahwa nilai signifikansi lebih kecil dari 0.05 yang menunjukkan bahwa optimalisasi terpaan iklan di berbagai saluran digital menjadi prioritas utama dalam upaya mendorong kesadaran pengguna dalam penggunaan suatu aplikasi layanan kesehatan.
+peneliti: Halim Agung, Rustono Farady Marta, Vina Virshella

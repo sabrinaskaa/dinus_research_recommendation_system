@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/8897/4145
+tanggal: 2023/11/23
+judul: Perbandingan Cacat Ubin Keramik dengan Metode K-Nearest Neighbor dan Support Vector Machine
+keyword: KNN, SVM, Ubin Keramik
+abstrak: Penentuan kualitas ubin keramik telah dilakukan secara otomatis dalam beberapa tahun terakhir. Kendala dalam penentuan ubin keramik bercacat dapat berpengaruh terhadap penurunan kualitas produk akhir. Isu yang menjadi fokus dalam penelitian ini adalah perbandingan metode K-Nearest Neighbor (KNN) dan Support Vector Machine (SVM) untuk mendeteksi cacat pada ubin keramik guna mencapai hasil yang lebih akurat. Untuk mengatasi isu tersebut, proses yang dilakukan meliputi pengumpulan data citra ubin keramik, yang kemudian diikuti oleh tahap preprocessing dan ekstraksi fitur berdasarkan tekstur. Data citra tersebut selanjutnya diklasifikasikan menggunakan metode KNN dan SVM. Temuan penelitian menunjukkan bahwa pengklasifikasian dengan metode KNN pada k = 3 mampu memberikan hasil yang lebih unggul, yaitu mencapai akurasi 98,947%, sedangkan pengklasifikasian dengan metode SVM hanya mencapai akurasi 85,263%.
+peneliti: Riza Alamsyah, Iman Permana, Maharani Siti Aulieza

@@ -1,0 +1,14 @@
+data_raw: "data/raw"
+data_interim: "data/interim"
+data_processed: "data/processed"
+profiles_dir: "data/processed/profiles"
+
+index_dir: "indexes/bm25"
+bm25_index_file: "indexes/bm25/index.pkl"
+
+parsed_jsonl: "data/interim/parsed_docs.jsonl"
+processed_jsonl: "data/processed/docs.jsonl"
+
+supervisor_profiles_file: "data/processed/profiles/supervisors.json"
+stopwords_file: "configs/stopwords_id.txt"
+settings_file: "configs/settings.yaml"

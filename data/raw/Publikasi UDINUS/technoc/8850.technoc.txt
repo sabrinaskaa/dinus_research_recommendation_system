@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/8850/4146
+tanggal: 2023/11/23
+judul: Pengaruh Serangan LPF pada Audio Watermarking dengan Metode DWT-Histogram Terhadap Performa BER
+keyword: DWT,Audio watermarking,LPF, Histogram, BER
+abstrak: Perkembangan teknologi yang pesat memberikan kemudahan bagi masyarakat umum untuk mengakses data, sehingga dibutuhkan perlindungan hak cipta guna melindungi hak kepemilikan data secara legal. Audio watermarking yang diusulkan menanamkan informasi bit biner ke dalam media digital berupa audio tanpa menyebabkan kerusakan pada media yang disisipi informasi. Penelitian ini menggunakan kombinasi metode Discrete Wavelet Transform (DWT) dan Histogram. Hasil yang diperoleh berupa audio ter-watermark yang memiliki kualitas tinggi dan tidak menimbulkan dampak berarti terhadap sinyal informasi yang telah disisipkan, berdasarkan parameter Bit Error Ratio (BER). Pada penelitian ini, rata-rata BER yang diperoleh saat dilakukan serangan Low Pass Filter (LPF) adalah sebesar 0,07952, sehingga metode ini memiliki ketahanan yang tinggi. Sementara itu, tanpa adanya serangan, watermark dapat terekstraksi secara sempurna tanpa kerusakan dengan nilai BER = 0.
+peneliti: Vera Noviana Sulistyawan, Tatyantoro Andrasto, Khoirudin Fathoni, Hendra Dewinta Setiyani, Nur Rokhimatul Azizah, Fahrizal Adnan, Yogi Prasetyo

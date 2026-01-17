@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/technoc/article/view/12955/5493
+tanggal: 2025/08/18
+judul: Model Deteksi Tutupan Lahan di Kecamatan Gunungsitoli Menggunakan Algoritma Decision Tree Berbasis Machine Learning
+keyword: Decision Tree, Machine Learning, Tutupan Lahan, Gunungsitoli
+abstrak: Perkembangan teknologi penginderaan jauh semakin pesat. Integrasi data penginderaan jauh dan Artificial Intelligence - Machine Learning menjadi pendekatan yang sangat efisien dalam mendeteksi tutupan lahan. Penelitian ini bertujuan untuk membangun model algoritma tutupan lahan menggunakan algoritma Decision Tree. Data yang digunakan yakni Citra PlanetScope NICFI Level 1 yang diturunkan menjadi beberapa indeks spektral yang terdiri atas Normalized Difference Vegetation Index (NDVI), Visible Atmospherically Resistant Index (VARI), Soil Adjusted Vegetation Index (SAVI), Normalized Difference Water Index (NDWI), dan Green-Red Vegetation Index (GRVI). Untuk mengukur setiap variabel digunakan Information Gain, Gini Index, dan Gain Ratio. Hasil penelitian menunjukkan bahwa SAVI dan NDVI merupakan variabel yang informatif dalam membangun model. Distribusi tutupan lahan di Kecamatan Gunungsitoli didominasi oleh tutupan hutan.
+peneliti: Amati Eltriman Hulu, Mizero Alexis

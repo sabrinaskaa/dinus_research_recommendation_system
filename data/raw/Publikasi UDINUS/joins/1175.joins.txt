@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1175/884
+tanggal: 2016/06/17
+judul: Rancang Bangun Aplikasi Data Mining Untuk Prediksi Kelulusan Mahasiswa Dengan Algoritma Backpropagation Neural Network
+keyword: Data Mining, Prediksi, Algoritma Neural Network (Back Propagation), Prototipe
+abstrak: Saat ini, ketidakseimbangan antara tingginya jumlah mahasiswa baru dan jumlah lulusan setiap tahunnya menjadi permasalahan serius bagi perguruan tinggi. Agar program studi dapat melakukan antisipasi dini terhadap mahasiswa yang berpotensi tidak lulus tepat waktu, diperlukan suatu mekanisme deteksi yang akurat. Seiring pesatnya perkembangan teknologi data mining dalam menangani pengolahan data berskala besar, metode ini menjadi solusi efektif untuk keperluan prediksi dan klasifikasi. Penelitian ini menerapkan algoritma Backpropagation Neural Network untuk memprediksi masa studi mahasiswa. Proses pembentukan pola dari data training dilakukan menggunakan perangkat lunak RapidMiner. Atribut input yang digunakan meliputi Indeks Prestasi (IP) semester 1 hingga 4 serta Indeks Prestasi Kumulatif (IPK). Hasil pengujian menunjukkan tingkat akurasi yang sangat baik, yaitu sebesar 99,49%. Selanjutnya, pola pengetahuan (knowledge) yang terbentuk diterjemahkan dan diimplementasikan ke dalam aplikasi Matlab.
+peneliti: Desi Hanindya Ujianti, Affandy Affandy

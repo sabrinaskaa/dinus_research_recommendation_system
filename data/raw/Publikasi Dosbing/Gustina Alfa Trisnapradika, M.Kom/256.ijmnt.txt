@@ -1,0 +1,6 @@
+url: https://ejournals.umn.ac.id/index.php/IJNMT/issue/download/256/IJNMT%20June%202024#page=14
+tanggal: 2024/07/15
+judul: Perbandingan Algoritma Machine Learning Linier dan Non-Linier untuk Memprediksi Efektivitas Ekstrak Tumbuhan sebagai Inhibitor Korosi
+keyword: Machine Learning, Korosi, Ekstrak Tumbuhan, Adaboost Regressor, Regresi Linier.
+abstrak: Penelitian ini bertujuan untuk mengembangkan model Machine Learning (ML) guna memprediksi secara akurat potensi inhibisi korosi dari ekstrak tumbuhan. Pengembangan model ML melibatkan normalisasi data, pemilihan algoritma ML linier dan non-linier, pelatihan model menggunakan k-fold cross-validation, serta evaluasi kinerja menggunakan metrik regresi seperti MSE, RMSE, MAE, dan R². Berbagai algoritma ML dibandingkan, dengan model AdaBoost Regressor (ABR) mencapai kinerja terbaik yang ditandai oleh nilai R² sebesar 0,993 dan MSE yang rendah sebesar 0,002. Hasil ini menyoroti potensi model ML dalam memprediksi inhibitor korosi yang efektif dari ekstrak tumbuhan. Selain itu, analisis pentingnya fitur menunjukkan bahwa dua fitur, yaitu konsentrasi (Conc) dan LUMO, memiliki pengaruh signifikan terhadap model ABR. Penelitian ini memberikan kontribusi yang signifikan dalam pengembangan metode prediksi yang efektif pada industri pengendalian korosi.
+peneliti: Yudha Mulyana, Muhamad Akrom, Gustina Alfa Trisnapradika

@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/joins/article/view/1671/1172
+tanggal: 2017/12/15
+judul: Aplikasi Prediksi Harga Saham Menggunakan Metode Simple Moving Averages Pada Bursa Efek Indonesia
+keyword: Forecasting, Simple Moving Averages, WeightedMoving Averages, Saham
+abstrak: Saham merupakan instrumen pasar keuangan yang paling polular. Menerbitkan sebuah saham adalah salah satu pilihan banyak perusahaan ketika memutuskan menambahkan modal dari perusahaan. Di sisi lainnya, saham adalah sebuah variabel investasi yang paling sering dipilih oleh investor dikarenakan saham dapat memberikan keuntungan yang tidak sedikit. Permasalahan dalam penelitian ini adalah belum digunakannya teknik Forecasting. Pada penelitian ini mencoba membandingkan dua metode forecasting yaitu simple moving averages dan weighted moving averages. Setelah dibandingkannya dapat disimpulkan bahwa metode simple moving averages adalah metode yang paling cocok untuk digunakan dalam memprediksi harga saham, khususnya harga saham Bank BRI. Metode simple moving averages dipilih dikarenakan setelah dilakukan pengujian memiliki nilai error yang lebih sedikit dari pada weighted moving averages.
+peneliti: Fatkhurin, Sudaryanto

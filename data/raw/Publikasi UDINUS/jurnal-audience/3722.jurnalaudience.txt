@@ -1,0 +1,6 @@
+url: https://publikasi.dinus.ac.id/audience/article/view/3722/2048
+tanggal: 2020/10/19
+judul: PROTEKSI PRIVASI BIG DATA DALAM MEDIA SOSIAL
+keyword: data besar, Indonesia, kebijakan, media sosial, privasi
+abstrak: Perkembangan media sosial di Indonesia begitu pesat dengan jumlah pengguna yang terus meningkat. Akan tetapi hal tersebut kurang diimbangi dengan kesadaran tentang privasi dalam kaitannya dengan big data yang dihasilkan oleh penyedia layanan. Penyedia layanan memberikan kebijakan berupa syarat dan ketentuan akan tetapi masyarakat umumnya masih rendah dalam hal memiliki kesadaran tentang privasi data pribadi mereka. Penelitian ini bertujuan untuk mengetahui solusi dari permasalahan privasi big data dalam media sosial dan dianalisis dengan teori privasi komunikasi. Metode yang digunakan dalam penelitian ini adalah metode meta-analisis yang mengolah hasil temuan dari penelitian sebelumnya. Hasil dari penelitian ini berupa solusi bagi perlindungan privasi data individu saat pembuatan, penyimpanan, dan pemrosesan data.
+peneliti: Winarsih Winarsih, Irwansyah Irwansyah
