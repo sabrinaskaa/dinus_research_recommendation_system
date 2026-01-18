@@ -104,3 +104,21 @@ def build_text_for_index(
     if keyword: parts.append(keyword)
     if abstrak: parts.append(abstrak)
     return " ".join(parts).strip()
+
+def build_boosted_text_for_index(
+    judul: Optional[str],
+    keyword: Optional[str],
+    abstrak: Optional[str],
+    title_boost: int = 2,
+    keyword_boost: int = 3,
+    abstract_boost: int = 1,
+) -> str:
+    parts = []
+    if judul:
+        parts.extend([judul] * max(1, int(title_boost)))
+    if keyword:
+        parts.extend([keyword] * max(1, int(keyword_boost)))
+    if abstrak:
+        parts.extend([abstrak] * max(1, int(abstract_boost)))
+    return " ".join([p for p in parts if p]).strip()
+
