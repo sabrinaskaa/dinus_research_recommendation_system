@@ -9,7 +9,6 @@ type Tab = "citations" | "supervisors";
 export default function Page() {
   const [tab, setTab] = useState<Tab>("citations");
   const [query, setQuery] = useState("");
-  const [topK, setTopK] = useState(10);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -25,8 +24,8 @@ export default function Page() {
 
     try {
       const [c, s] = await Promise.all([
-        recommendCitations(query.trim(), topK),
-        recommendSupervisors(query.trim(), Math.min(topK, 20)),
+        recommendCitations(query.trim()),
+        recommendSupervisors(query.trim(), Math.min(20)),
       ]);
       setCitations(c);
       setSupervisors(s);
@@ -40,7 +39,7 @@ export default function Page() {
   return (
     <div className="container">
       <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 20 }}>
-        Research Recommendation Demo
+        Research Recommendation
       </div>
 
       <div className="card">
@@ -73,19 +72,6 @@ export default function Page() {
             >
               Dosen
             </button>
-
-            <span className="muted" style={{ fontSize: 13, marginLeft: 8 }}>
-              TopK:
-            </span>
-            <input
-              className="input"
-              style={{ width: 90 }}
-              type="number"
-              value={topK}
-              min={1}
-              max={50}
-              onChange={(e) => setTopK(parseInt(e.target.value || "10", 10))}
-            />
           </div>
 
           <button className="btn" onClick={run} disabled={!canRun || loading}>

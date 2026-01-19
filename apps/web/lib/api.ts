@@ -8,11 +8,13 @@ export type CitationItem = {
   tanggal?: string;
   url?: string;
   source?: string;
-  dosen?: string;
-  peneliti?: string;
   abstrak?: string;
-  snippet?: { snippet: string; matched: string[] };
-  explain?: { matched_terms: string[] };
+
+  explain?: {
+    matched_terms: string[];
+    abstract_text?: string;
+    abstract_html?: string;
+  };
 };
 
 export type SupervisorItem = {
@@ -21,8 +23,12 @@ export type SupervisorItem = {
   similarity?: number;
   matched_terms?: string[];
   pub_count?: number;
-  samples?: { doc_id?: string; judul?: string; tanggal?: string; url?: string }[];
-  top_terms?: string[];
+  samples?: {
+    doc_id?: string;
+    judul?: string;
+    tanggal?: string;
+    url?: string;
+  }[];
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
@@ -41,15 +47,18 @@ async function postJSON<T>(path: string, body: any): Promise<T> {
 }
 
 export async function recommendCitations(query: string, top_k = 10) {
-  return postJSON<{ results: CitationItem[]; tokens: string[]; expanded_tokens?: string[] }>(
-    "/recommend/citations",
-    { query, top_k }
-  );
+  return postJSON<{
+    results: CitationItem[];
+    tokens: string[];
+    expanded_tokens?: string[];
+    auto_k?: number;
+    max_top_k?: number;
+  }>("/recommend/citations", { query, top_k });
 }
 
 export async function recommendSupervisors(query: string, top_k = 10) {
   return postJSON<{ results: SupervisorItem[]; tokens: string[] }>(
     "/recommend/supervisors",
-    { query, top_k }
+    { query, top_k },
   );
 }

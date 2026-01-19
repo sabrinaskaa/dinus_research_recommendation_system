@@ -4,6 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional, Tuple
+import html
+import re
 
 # allow import from /src without installing package
 sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
@@ -55,6 +57,12 @@ BM25: BM25Index | None = None
 SUP_PROFILES: Dict[str, Any] | None = None
 DOCS_BY_ID: Dict[str, Dict[str, Any]] = {}  # doc_id -> processed doc
 
+# Extra lookup maps to make evidence/abstract resolution robust.
+# In some cases, a BM25 result may not resolve cleanly to DOCS_BY_ID
+# (e.g. when only doc_idx/url is present, or when the client caches older ids).
+DOCS_BY_URL: Dict[str, Dict[str, Any]] = {}  # url -> processed doc
+DOC_ID_BY_DOC_IDX: Dict[int, str] = {}  # doc_idx -> doc_id (from BM25.docs_meta)
+
 
 class QueryReq(BaseModel):
     query: str = Field(..., min_length=2, description="User query / topic / idea")
@@ -70,7 +78,7 @@ class PreprocessDebugReq(BaseModel):
 
 @app.on_event("startup")
 def _load_assets() -> None:
-    global BM25, SUP_PROFILES, DOCS_BY_ID
+    global BM25, SUP_PROFILES, DOCS_BY_ID, DOCS_BY_URL, DOC_ID_BY_DOC_IDX
 
     # Load BM25 index
     if paths.bm25_index_file.exists():
@@ -83,12 +91,27 @@ def _load_assets() -> None:
     # Load processed docs -> DOCS_BY_ID
     docs = read_jsonl(paths.processed_jsonl)
     DOCS_BY_ID = {}
+    DOCS_BY_URL = {}
     for d in docs:
         doc_id = d.get("doc_id")
         if doc_id:
             DOCS_BY_ID[str(doc_id)] = d
+        url = (d.get("url") or "").strip()
+        if url:
+            DOCS_BY_URL[url] = d
     if BM25 is not None:
         BM25.docs_by_id = DOCS_BY_ID  # type: ignore
+
+        # Build doc_idx -> doc_id mapping from BM25 meta (stable even if client caches idx)
+        DOC_ID_BY_DOC_IDX = {}
+        try:
+            meta_list = getattr(BM25, "docs_meta", None) or []
+            for i, meta in enumerate(meta_list):
+                did = (meta or {}).get("doc_id")
+                if did:
+                    DOC_ID_BY_DOC_IDX[int(i)] = str(did)
+        except Exception:
+            DOC_ID_BY_DOC_IDX = {}
 
 
 # -----------------------------
@@ -143,7 +166,104 @@ def _make_snippet(text: str, matched: List[str], max_len: int = 240) -> str:
     return snippet
 
 
-def _attach_explain(items: List[Dict[str, Any]], query_tokens: List[str]) -> List[Dict[str, Any]]:
+_SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
+_WORD_RE = re.compile(r"[a-zA-Z0-9_]+", re.UNICODE)
+
+
+def _best_sentence(text: str, terms: List[str], max_len: int = 360) -> str:
+    """Pick the sentence with highest overlap with `terms` (case-insensitive)."""
+    if not text:
+        return ""
+    tset = {t.lower() for t in terms if t}
+    if not tset:
+        # fallback: just truncate
+        return (text[:max_len] + "…") if len(text) > max_len else text
+
+    best = (0, "")
+    for s in _SENT_SPLIT.split(text):
+        s = (s or "").strip()
+        if not s:
+            continue
+        words = {w.lower() for w in _WORD_RE.findall(s)}
+        overlap = len(words & tset)
+        if overlap > best[0]:
+            best = (overlap, s)
+
+    out = best[1] or text
+    if len(out) > max_len:
+        out = out[:max_len].rsplit(" ", 1)[0] + "…"
+    return out
+
+
+def _highlight_html(text: str, terms: List[str]) -> str:
+    """Escape HTML then wrap matched terms with <b>...</b>."""
+    if not text:
+        return ""
+    safe = html.escape(text)
+
+    uniq: List[str] = []
+    seen = set()
+    for t in terms:
+        t = (t or "").strip()
+        if not t:
+            continue
+        tl = t.lower()
+        if tl in seen:
+            continue
+        seen.add(tl)
+        uniq.append(t)
+
+    # Replace longer terms first to reduce nested matches.
+    uniq.sort(key=lambda x: len(x), reverse=True)
+
+    for t in uniq:
+        pat = re.compile(rf"(?i)(?<![A-Za-z0-9_])({re.escape(t)})(?![A-Za-z0-9_])")
+        safe = pat.sub(lambda m: f"<b>{m.group(1)}</b>", safe)
+
+    return safe
+
+
+def _lookup_full_doc(it: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Resolve a result item to the full processed doc.
+
+    Primary key: doc_id
+    Fallbacks:
+      - doc_idx -> doc_id (BM25 meta)
+      - url
+    """
+    # 1) doc_id
+    doc_id = (it.get("doc_id") or "").__str__().strip()
+    if doc_id:
+        d = DOCS_BY_ID.get(doc_id)
+        if isinstance(d, dict):
+            return d
+
+    # 2) doc_idx
+    di = it.get("doc_idx", None)
+    try:
+        if di is not None:
+            did = DOC_ID_BY_DOC_IDX.get(int(di))
+            if did:
+                d = DOCS_BY_ID.get(did)
+                if isinstance(d, dict):
+                    return d
+    except Exception:
+        pass
+
+    # 3) url
+    url = (it.get("url") or "").strip()
+    if url:
+        d = DOCS_BY_URL.get(url)
+        if isinstance(d, dict):
+            return d
+
+    return None
+
+
+def _attach_explain(
+    items: List[Dict[str, Any]],
+    highlight_terms: List[str],
+) -> List[Dict[str, Any]]:
     """
     Attach:
       - explain.matched_terms
@@ -152,15 +272,43 @@ def _attach_explain(items: List[Dict[str, Any]], query_tokens: List[str]) -> Lis
     """
     out = []
     for it in items:
-        doc_tokens = it.get("tokens", []) or []
-        matched = _matched_terms(query_tokens, doc_tokens, limit=12)
+        full = _lookup_full_doc(it)
 
-        text_src = (it.get("abstrak") or "") or (it.get("judul") or "")
-        snippet = _make_snippet(text_src, matched, max_len=260)
+        doc_tokens = (it.get("tokens") or [])
+        if (not doc_tokens) and isinstance(full, dict):
+            doc_tokens = full.get("tokens") or []
+
+        # Matched terms are based on *stemmed tokens* (BM25 space)
+        matched = _matched_terms(highlight_terms, doc_tokens, limit=12)
+
+        # Prefer full abstrak from processed docs.
+        # Some retrieval outputs only carry meta fields, so relying on it.get('abstrak') can be empty.
+        abstrak = ""
+        if isinstance(full, dict):
+            abstrak = full.get("abstrak") or ""
+        if not abstrak:
+            abstrak = (it.get("abstrak") or "")
+
+        judul = ""
+        if isinstance(full, dict):
+            judul = full.get("judul") or ""
+        if not judul:
+            judul = (it.get("judul") or "")
+
+        # Tokens should come from processed docs, to make matched_terms accurate.
+        if (not doc_tokens) and isinstance(full, dict):
+            doc_tokens = full.get("tokens") or []
+
+        evidence_text = _best_sentence(abstrak, highlight_terms, max_len=360) if abstrak else judul
+        evidence_html = _highlight_html(evidence_text, highlight_terms)
 
         it2 = dict(it)
-        it2["explain"] = {"matched_terms": matched}
-        it2["snippet"] = {"snippet": snippet, "matched": matched}
+        it2["explain"] = {"matched_terms": matched, "abstract_html": evidence_html, "abstract_text": evidence_text}
+        # keep backward compatible snippet fields
+        it2["snippet"] = {"snippet": evidence_text, "matched": matched, "html": evidence_html}
+        # expose abstrak for UI if desired
+        if abstrak and not it2.get("abstrak"):
+            it2["abstrak"] = abstrak
         out.append(it2)
     return out
 
@@ -241,6 +389,11 @@ def search(req: QueryReq) -> Dict[str, Any]:
 
     q_tokens = preprocess_text(req.query, STOPWORDS, stem_mode=STEM_MODE)
 
+    # Raw (non-stemmed) terms: helps highlight words in the *original* abstract
+    # even when we use stemming for retrieval.
+    raw_terms = [w.lower() for w in _WORD_RE.findall(req.query or "") if len(w) > 2]
+    raw_terms = [w for w in raw_terms if w not in STOPWORDS]
+
     # 1) initial retrieval (include_meta=True -> always has doc_idx, meta)
     initial = bm25_search(BM25, q_tokens, top_k=max(20, req.top_k * 2), include_meta=True)
 
@@ -251,11 +404,13 @@ def search(req: QueryReq) -> Dict[str, Any]:
         query_tokens=q_tokens,
         max_expand=8,
         top_docs=8,
+        idf=getattr(BM25, "idf", None),
     )
 
     # 3) final retrieval
     results = bm25_search(BM25, q_tokens2, top_k=req.top_k, include_meta=True)
-    results = _attach_explain(results, q_tokens2)
+    highlight_terms = list(dict.fromkeys((q_tokens or []) + raw_terms))
+    results = _attach_explain(results, highlight_terms)
 
     return {
         "query": req.query,
@@ -272,14 +427,26 @@ def recommend_citation(req: QueryReq) -> Dict[str, Any]:
         return {"error": "BM25 index belum ada. Jalankan: python pipelines/indexing/build_bm25.py"}
 
     q_tokens = preprocess_text(req.query, STOPWORDS, stem_mode=STEM_MODE)
+    raw_terms = [w.lower() for w in _WORD_RE.findall(req.query or "") if len(w) > 2]
+    raw_terms = [w for w in raw_terms if w not in STOPWORDS]
 
     initial = bm25_search(BM25, q_tokens, top_k=max(25, req.top_k * 3), include_meta=True)
-    q_tokens2 = expand_query_from_top_docs(DOCS_BY_ID, initial, q_tokens, max_expand=8, top_docs=8)
+    q_tokens2 = expand_query_from_top_docs(
+        DOCS_BY_ID,
+        initial_hits=initial,
+        query_tokens=q_tokens,
+        max_expand=8,
+        top_docs=8,
+        idf=getattr(BM25, "idf", None),
+    )
 
-    results = recommend_citations(BM25, q_tokens2, top_k=req.top_k, diversify=True)
+    # Pass both original tokens and expanded tokens so the recommender can
+    # use anchors from the original query to avoid lexical drift.
+    results = recommend_citations(BM25, q_tokens2, top_k=req.top_k, diversify=True, original_query_tokens=q_tokens)
 
     # ensure explain/snippet attached (recommend_citations returns meta+score2)
-    results = _attach_explain(results, q_tokens2)
+    highlight_terms = list(dict.fromkeys((q_tokens or []) + raw_terms))
+    results = _attach_explain(results, highlight_terms)
 
     return {
         "query": req.query,
@@ -362,11 +529,21 @@ def demo(req: QueryReq) -> Dict[str, Any]:
     # citations
     if BM25 is not None:
         q_tokens = preprocess_text(req.query, STOPWORDS, stem_mode=STEM_MODE)
+        raw_terms = [w.lower() for w in _WORD_RE.findall(req.query or "") if len(w) > 2]
+        raw_terms = [w for w in raw_terms if w not in STOPWORDS]
         init = bm25_search(BM25, q_tokens, top_k=max(25, req.top_k * 3), include_meta=True)
-        q_tokens2 = expand_query_from_top_docs(DOCS_BY_ID, init, q_tokens, max_expand=8, top_docs=8)
+        q_tokens2 = expand_query_from_top_docs(
+            DOCS_BY_ID,
+            initial_hits=init,
+            query_tokens=q_tokens,
+            max_expand=8,
+            top_docs=8,
+            idf=getattr(BM25, "idf", None),
+        )
 
-        cits = recommend_citations(BM25, q_tokens2, top_k=req.top_k, diversify=True)
-        cits = _attach_explain(cits, q_tokens2)
+        cits = recommend_citations(BM25, q_tokens2, top_k=req.top_k, diversify=True, original_query_tokens=q_tokens)
+        highlight_terms = list(dict.fromkeys((q_tokens or []) + raw_terms))
+        cits = _attach_explain(cits, highlight_terms)
 
         out["tokens"] = q_tokens
         out["expanded_tokens"] = q_tokens2

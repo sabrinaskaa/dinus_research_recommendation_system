@@ -6,6 +6,24 @@ from collections import defaultdict
 from typing import Dict, List, Any, Tuple
 
 
+# Kata-kata super umum yang sering bikin rekomendasi dosen "nyasar".
+# Ini bukan stopword bahasa Indonesia biasa, tapi "generic research words".
+# Kita TURUNKAN bobotnya supaya query seperti "machine learning" tidak
+# otomatis mengangkat dosen yang domainnya beda jauh.
+GENERIC_TERMS = {
+    # Indo
+    "deteksi", "prediksi", "klasifikasi", "klaster", "pengembangan", "analisis",
+    "sistem", "metode", "model", "algoritma", "pendekatan", "penerapan",
+    "berbasis", "menggunakan", "dengan", "untuk", "pada", "dalam", "terhadap",
+    "data", "dataset", "fitur", "seleksi", "optimasi", "evaluasi",
+    # English
+    "method", "methods", "model", "models", "algorithm", "algorithms",
+    "approach", "system", "analysis", "data", "feature", "features",
+    "classification", "prediction", "detection", "optimization", "evaluation",
+    "machine", "learning", "deep", "neural", "network", "networks",
+}
+
+
 def _parse_year(tanggal: str | None) -> int:
     if not tanggal:
         return 0
@@ -27,7 +45,7 @@ def build_supervisor_profiles(processed_docs: List[Dict[str, Any]]) -> Dict[str,
     Build supervisor profiles ONLY from source == "dosbing" and dosen != None.
 
     Treat each DOSEN as one "document" for DF/IDF across dosen.
-    Vector weighting: (1 + log(1 + tf)) * idf  (same as your original, stable)
+    Vector weighting: (1 + log(1 + tf)) * idf
 
     Returns:
       {
@@ -74,7 +92,7 @@ def build_supervisor_profiles(processed_docs: List[Dict[str, Any]]) -> Dict[str,
     N = max(1, len(tf_dosen))
     idf: Dict[str, float] = {}
     for term, dfi in df.items():
-        # BM25-style idf (same style you used)
+        # BM25-style idf
         idf[term] = math.log(1 + (N - dfi + 0.5) / (dfi + 0.5))
 
     # Build profiles
@@ -86,12 +104,8 @@ def build_supervisor_profiles(processed_docs: List[Dict[str, Any]]) -> Dict[str,
 
         norm = math.sqrt(sum(v * v for v in vec.values())) + 1e-9
 
-        # Select top_terms but avoid extremely generic terms (idf too low)
-        # Threshold: keep idf >= median-ish proxy using simple cutoff
-        # You can tune cutoff later; this is safe default.
-        # If you want "no filtering", set cutoff to 0.0.
+        # top_terms: avoid extremely generic terms (idf too low)
         idf_cutoff = 0.15
-
         top_terms_scored = sorted(
             ((t, w) for t, w in vec.items() if idf.get(t, 0.0) >= idf_cutoff),
             key=lambda x: x[1],
@@ -138,26 +152,21 @@ def recommend_supervisors(
     profiles_obj: Dict[str, Any],
     query_tokens: List[str],
     top_k: int = 5,
+    *,
+    min_similarity: float = 0.08,
+    rel_cutoff: float = 0.35,
+    anchor_top_n: int = 2,
+    anchor_idf_min: float = 0.65,
+    generic_downweight: float = 0.35,
 ) -> List[Dict[str, Any]]:
     """
     Recommend dosen based on cosine similarity between query TF-IDF vector
     and each dosen profile vector.
 
-    Adds explainability:
-      - matched_terms: overlap with dosen top_terms (quick human cue)
-      - evidence_terms: top terms that contribute most to cosine (real reason)
-
-    Output item:
-      {
-        "dosen": str,
-        "score": float,
-        "similarity": float,
-        "matched_terms": [...],
-        "evidence_terms": [{"term":..., "q_w":..., "d_w":..., "contrib":...}, ...],
-        "pub_count": int,
-        "samples": [...],
-        "top_terms": [...]
-      }
+    Fix utama:
+      1) Anchor gating (term spesifik) biar gak nyasar karena kata generik
+      2) Downweight kata generik
+      3) Threshold + relative cutoff biar score kecil banget kebuang
     """
     idf: Dict[str, float] = profiles_obj.get("idf", {}) or {}
     profiles: Dict[str, Any] = profiles_obj.get("profiles", {}) or {}
@@ -169,11 +178,31 @@ def recommend_supervisors(
             continue
         qtf[t] += 1
 
+    # Anchor terms: pilih term query paling spesifik (idf tinggi), non-generic.
+    q_terms_unique = list(qtf.keys())
+    anchor_candidates = [t for t in q_terms_unique if t in idf and t not in GENERIC_TERMS]
+    anchor_candidates.sort(key=lambda t: float(idf.get(t, 0.0)), reverse=True)
+    anchors = [
+        t for t in anchor_candidates[: max(1, anchor_top_n)]
+        if float(idf.get(t, 0.0)) >= anchor_idf_min
+    ]
+
     # query vector
     qvec: Dict[str, float] = {}
     for term, f in qtf.items():
         if term in idf:
-            qvec[term] = (1.0 + _safe_log1p(f)) * float(idf.get(term, 0.0))
+            w = (1.0 + _safe_log1p(f)) * float(idf.get(term, 0.0))
+            # downweight kata generik, kecuali kalau dia anchor
+            if term in GENERIC_TERMS and term not in anchors:
+                w *= float(generic_downweight)
+            qvec[term] = float(w)
+
+    # fallback kalau qvec kosong
+    if not qvec and qtf:
+        for term, f in qtf.items():
+            w = (1.0 + _safe_log1p(f)) * float(idf.get(term, 0.0))
+            if w > 0:
+                qvec[term] = float(w)
 
     qnorm = math.sqrt(sum(v * v for v in qvec.values())) + 1e-9
     qset = set(query_tokens or [])
@@ -199,15 +228,21 @@ def recommend_supervisors(
         vec = info.get("vector", {}) or {}
         norm = float(info.get("norm", 1.0))
 
+        # Anchor gating: kalau query punya anchor spesifik, dosen wajib punya itu.
+        if anchors:
+            has_anchor = any(float(vec.get(a, 0.0)) > 0.0 for a in anchors)
+            if not has_anchor:
+                continue
+
         sim, evidence_terms = cosine_and_evidence(vec, norm, top_evidence=6)
 
         # quick matched terms for UI readability (overlap with top_terms)
         matched = [t for t in (info.get("top_terms", []) or []) if t in qset][:8]
 
-        # small bonus for overlap readability (your spirit, but not overpower)
+        # small bonus for overlap readability (tidak boleh overpower)
         bonus = 0.03 * len(matched)
 
-        # if sim == 0 and no matched evidence, skip (avoid noisy results)
+        # skip noisy
         if sim <= 0 and not matched:
             continue
 
@@ -223,4 +258,13 @@ def recommend_supervisors(
         })
 
     scored.sort(key=lambda x: x["score"], reverse=True)
+
+    # Hard filter: buang similarity kecil banget (noise), tapi tetap relatif.
+    if scored:
+        best_sim = max(float(x.get("similarity", 0.0)) for x in scored) or 0.0
+        cutoff = max(float(min_similarity), float(best_sim) * float(rel_cutoff))
+        filtered = [x for x in scored if float(x.get("similarity", 0.0)) >= cutoff]
+        if filtered:
+            return filtered[:top_k]
+
     return scored[:top_k]

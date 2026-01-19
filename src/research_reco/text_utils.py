@@ -3,13 +3,19 @@ import re
 from pathlib import Path
 from typing import List, Set, Optional
 
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+try:
+    from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+    from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+    _HAS_SASTRAWI = True
+except ModuleNotFoundError:  # optional dependency
+    StemmerFactory = None  # type: ignore
+    StopWordRemoverFactory = None  # type: ignore
+    _HAS_SASTRAWI = False
 
 _WORD_RE = re.compile(r"[a-zA-Z0-9_]+", re.UNICODE)
 
-_STEMMER = StemmerFactory().create_stemmer()
-_SASTRAWI_STOPWORDS = set(StopWordRemoverFactory().get_stop_words())
+_STEMMER = StemmerFactory().create_stemmer() if _HAS_SASTRAWI else None
+_SASTRAWI_STOPWORDS = set(StopWordRemoverFactory().get_stop_words()) if _HAS_SASTRAWI else set()
 
 _TECH_WHITELIST = {
     "ai","ml","nlp","cnn","rnn","lstm","gru","svm","knn","rf","xgboost","bert","gpt",
@@ -22,7 +28,7 @@ _TECH_WHITELIST = {
 
 def load_stopwords(custom_path: Path, use_sastrawi: bool, use_domain: bool) -> Set[str]:
     base: Set[str] = set()
-    if use_sastrawi:
+    if use_sastrawi and _HAS_SASTRAWI:
         base |= set(_SASTRAWI_STOPWORDS)
 
     if use_domain and custom_path.exists():
@@ -36,6 +42,8 @@ def tokenize(text: str) -> List[str]:
     return _WORD_RE.findall(text)
 
 def stem_tokens_full(tokens: List[str]) -> List[str]:
+    if _STEMMER is None:
+        return list(tokens)
     return [_STEMMER.stem(t) for t in tokens]
 
 def _looks_technical_or_english(token: str) -> bool:
@@ -72,7 +80,10 @@ def selective_stem(tokens: List[str]) -> List[str]:
     out: List[str] = []
     for t in tokens:
         if _looks_indonesianish(t):
-            out.append(_STEMMER.stem(t))
+            if _STEMMER is None:
+                out.append(t)
+            else:
+                out.append(_STEMMER.stem(t))
         else:
             out.append(t)
     return out
@@ -121,4 +132,3 @@ def build_boosted_text_for_index(
     if abstrak:
         parts.extend([abstrak] * max(1, int(abstract_boost)))
     return " ".join([p for p in parts if p]).strip()
-
