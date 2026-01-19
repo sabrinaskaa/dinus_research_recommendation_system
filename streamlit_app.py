@@ -1,33 +1,60 @@
 # streamlit_app.py
-import os
-import json
-import html
-import re
-import urllib.parse
-from typing import Any, Dict, List, Tuple
+# Streamlit-only version: recommendation logic runs locally (no FastAPI backend).
 
-import requests
+from __future__ import annotations
+
+import html
+import json
+import re
+import sys
+import urllib.parse
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
 import streamlit as st
+
+
+# =========================
+# Make /src importable
+# =========================
+HERE = Path(__file__).resolve()
+SRC_CANDIDATES = [
+    HERE.parent / "src",
+    HERE.parent.parent / "src",
+    HERE.parent / "dinus_research_recommendation_system" / "src",
+]
+for p in SRC_CANDIDATES:
+    if p.exists():
+        sys.path.insert(0, str(p))
+        break
+
+
+try:
+    from research_reco.config import load_paths, load_settings
+    from research_reco.io_utils import read_json, read_jsonl
+    from research_reco.text_utils import load_stopwords, preprocess_text
+    from research_reco.bm25 import BM25Index, bm25_search
+    from research_reco.query_expansion import expand_query_from_top_docs
+    from research_reco.recommend import recommend_citations
+    from research_reco.supervisor_profiles import recommend_supervisors
+except Exception as e:
+    st.error(
+        "Gagal import modul project dari folder src/.\n\n"
+        "Pastikan struktur repo kamu ada folder `src/research_reco` dan Streamlit dijalankan dari root repo.\n\n"
+        f"Detail: {e}"
+    )
+    st.stop()
+
 
 
 # =========================
 # Config
 # =========================
-st.set_page_config(
-    page_title="DINUS Research Recommendation",
-    layout="wide",
-)
-
-API_BASE = os.getenv("API_BASE_URL", "").strip()
-if not API_BASE:
-    API_BASE = os.getenv("NEXT_PUBLIC_API_BASE_URL", "").strip()
-if not API_BASE:
-    API_BASE = "http://localhost:8000"
-API_BASE = API_BASE.rstrip("/")
+st.set_page_config(page_title="DINUS Research Recommendation", layout="wide")
 
 
 # =========================
-# CSS (Dark UI + spacing + tidy buttons)
+# CSS (Dark UI + tidy spacing + html buttons)
 # =========================
 CSS = """
 <style>
@@ -54,12 +81,12 @@ html, body, [class*="css"] {
   max-width: 1100px;
 }
 
-/* ===== Fix space above input (label hidden) ===== */
+/* Fix space above input (hide label) */
 div[data-testid="stTextInput"] label { display:none !important; }
 div[data-testid="stTextInput"] > div { margin-top:0 !important; padding-top:0 !important; }
 div[data-testid="stTextInput"] .stTextInput { margin-top:0 !important; }
 
-/* streamlit default spacing sometimes too big */
+/* Streamlit default spacing sometimes too big */
 div[data-testid="stVerticalBlock"] > div { padding-top: 0 !important; }
 
 h1, h2, h3 { color: var(--text); }
@@ -127,8 +154,8 @@ h1, h2, h3 { color: var(--text); }
   color: var(--muted);
 }
 
-/* Make Streamlit buttons consistent */
-div.stButton > button, a[data-testid="stLinkButton"]{
+/* Streamlit buttons consistent */
+div.stButton > button{
   border: 1px solid var(--border) !important;
   background: rgba(255,255,255,0.06) !important;
   color: var(--text) !important;
@@ -137,48 +164,295 @@ div.stButton > button, a[data-testid="stLinkButton"]{
   height: 44px !important;
   font-weight: 650 !important;
   white-space: nowrap !important;
-}
-div.stButton > button{
   font-size: 13px !important;
 }
-a[data-testid="stLinkButton"]{
-  font-size: 13px !important;
-}
-div.stButton > button:hover, a[data-testid="stLinkButton"]:hover{
+div.stButton > button:hover{
   background: rgba(255,255,255,0.10) !important;
 }
 
 /* Better checkbox color */
 [data-testid="stCheckbox"] label { color: var(--text) !important; }
 
-/* Inline action row spacing */
+/* HTML action row (Buka, WA, Copy) */
+.btnRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top: 10px;
+  align-items: center;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  text-decoration:none;
+  font-size: 13px;
+  cursor:pointer;
+  user-select:none;
+}
+.btn:hover{ background: rgba(255,255,255,0.10); }
+.btn:active{ transform: translateY(1px); }
+
+/* Inline action row spacing (for st.columns) */
 .btnRowInline [data-testid="stHorizontalBlock"]{
   gap: 10px !important;
 }
+
+/* Make link_button look like our dark buttons */
+a[data-testid="stLinkButton"]{
+  border: 1px solid var(--border) !important;
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  height: 44px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+a[data-testid="stLinkButton"]:hover{
+  background: rgba(255,255,255,0.10) !important;
+}
 </style>
 """
+
 st.markdown(CSS, unsafe_allow_html=True)
 
+# =========================
+# Evidence + highlight helpers (adapted from API logic)
+# =========================
+_WORD_RE = re.compile(r"[A-Za-z0-9_]+", re.UNICODE)
+_SENT_SPLIT = re.compile(r"(?<=[\.!\?])\s+")
 
-# =========================
-# Helpers
-# =========================
-def api_post(path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-    url = f"{API_BASE}{path}"
-    try:
-        r = requests.post(url, json=payload, timeout=60)
-    except requests.RequestException as e:
-        raise RuntimeError(
-            f"Gagal fetch ke API.\nURL: {url}\n"
-            f"Pastikan backend jalan + API_BASE_URL benar.\nDetail: {e}"
+
+def _matched_terms(query_terms: List[str], text: str) -> List[str]:
+    if not query_terms or not text:
+        return []
+    t = text.lower()
+    hits = []
+    for w in query_terms:
+        ww = str(w).lower().strip()
+        if len(ww) < 2:
+            continue
+        if ww in t:
+            hits.append(ww)
+    # unique preserve order
+    seen = set()
+    out = []
+    for x in hits:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+
+
+def _best_sentence(abstract: str, terms: List[str], max_chars: int = 320) -> str:
+    if not abstract:
+        return ""
+    sents = _SENT_SPLIT.split(abstract)
+    if not sents:
+        sents = [abstract]
+
+    best = ""
+    best_score = -1
+    for s in sents:
+        s_clean = s.strip()
+        if not s_clean:
+            continue
+        score = 0
+        s_low = s_clean.lower()
+        for t in terms:
+            if t and str(t).lower() in s_low:
+                score += 1
+        # prefer medium length evidence
+        score = score * 10 - abs(len(s_clean) - 220) / 50
+        if score > best_score:
+            best_score = score
+            best = s_clean
+
+    if len(best) > max_chars:
+        best = best[: max_chars - 3].rstrip() + "..."
+    return best
+
+
+def _highlight_html(text: str, terms: List[str]) -> str:
+    """HTML-escape then bold matched terms with safe word-ish boundary."""
+    if not text:
+        return ""
+    out = html.escape(text)
+
+    uniq = {t.strip() for t in terms if isinstance(t, str) and len(t.strip()) >= 2}
+    for t in sorted(uniq, key=len, reverse=True):
+        # boundary: not letter/digit/underscore around term
+        pattern = re.compile(
+            rf"(?<![A-Za-z0-9_])({re.escape(t)})(?![A-Za-z0-9_])",
+            flags=re.IGNORECASE,
         )
-    if r.status_code >= 400:
-        raise RuntimeError(f"API error {r.status_code}: {r.text[:800]}")
-    return r.json()
+        out = pattern.sub(r"<b>\1</b>", out)
+    return out
 
 
+def _lookup_full_doc(
+    item: Dict[str, Any],
+    docs_by_id: Dict[str, Dict[str, Any]],
+    docs_by_url: Dict[str, Dict[str, Any]],
+    doc_id_by_doc_idx: Dict[int, str],
+) -> Dict[str, Any]:
+    doc: Optional[Dict[str, Any]] = None
+
+    doc_id = item.get("doc_id")
+    if doc_id and str(doc_id) in docs_by_id:
+        doc = docs_by_id[str(doc_id)]
+
+    if doc is None and item.get("url"):
+        u = str(item.get("url"))
+        doc = docs_by_url.get(u)
+
+    if doc is None and item.get("doc_idx") is not None:
+        try:
+            did = doc_id_by_doc_idx.get(int(item.get("doc_idx")))
+            if did:
+                doc = docs_by_id.get(did)
+        except Exception:
+            pass
+
+    return doc or {}
+
+
+def _attach_explain(
+    results: List[Dict[str, Any]],
+    highlight_terms: List[str],
+    docs_by_id: Dict[str, Dict[str, Any]],
+    docs_by_url: Dict[str, Dict[str, Any]],
+    doc_id_by_doc_idx: Dict[int, str],
+) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for it in results:
+        doc = _lookup_full_doc(it, docs_by_id, docs_by_url, doc_id_by_doc_idx)
+        abstract = (doc.get("abstrak") or doc.get("abstract") or it.get("abstrak") or it.get("abstract") or "")
+        abstract = str(abstract)
+
+        matched = _matched_terms(highlight_terms, abstract)
+        evidence = _best_sentence(abstract, matched)
+        html_ev = _highlight_html(evidence, matched)
+
+        it2 = dict(it)
+        it2["explain"] = {
+            "matched_terms": matched,
+            "abstract_html": html_ev,
+        }
+
+        # fallback fields (biar UI konsisten)
+        if doc.get("judul") and not it2.get("judul"):
+            it2["judul"] = doc.get("judul")
+        if doc.get("tanggal") and not it2.get("tanggal"):
+            it2["tanggal"] = doc.get("tanggal")
+        if doc.get("url") and not it2.get("url"):
+            it2["url"] = doc.get("url")
+        if doc.get("source") and not it2.get("source"):
+            it2["source"] = doc.get("source")
+
+        out.append(it2)
+    return out
+
+
+# =========================
+# Cache assets (BM25 index, docs, profiles, stopwords)
+# =========================
+@st.cache_resource(show_spinner=False)
+def load_assets() -> Dict[str, Any]:
+    # try to locate configs relative to current working dir
+    # (Streamlit Cloud runs from repo root)
+    paths_cfg = "configs/paths.yaml"
+    if not Path(paths_cfg).exists():
+        # common alt: nested folder
+        nested = HERE.parent / "dinus_research_recommendation_system" / "configs" / "paths.yaml"
+        if nested.exists():
+            paths_cfg = str(nested)
+
+    paths = load_paths(paths_cfg)
+    settings = load_settings(paths_cfg)
+
+    # stopwords
+    stopwords = load_stopwords(
+        paths.stopwords_file,
+        use_sastrawi=settings.use_sastrawi_stopwords,
+        use_domain=settings.use_domain_stopwords,
+    )
+
+    # docs
+    docs_processed = read_jsonl(paths.processed_jsonl)
+    docs_by_id = {str(d.get("doc_id")): d for d in docs_processed if d.get("doc_id") is not None}
+    docs_by_url = {str(d.get("url")): d for d in docs_processed if d.get("url")}
+
+    # detect stemming_mode from processed docs if present
+    stem_mode = settings.stemming_mode
+    if docs_processed:
+        m = docs_processed[0].get("stemming_mode")
+        if isinstance(m, str) and m.strip():
+            stem_mode = m.strip().lower()
+
+    # bm25
+    bm25 = None
+    doc_id_by_doc_idx: Dict[int, str] = {}
+    if paths.bm25_index_file.exists():
+        bm25 = BM25Index.load(paths.bm25_index_file)
+        # attach docs for explain
+        try:
+            bm25.docs_by_id = docs_by_id
+        except Exception:
+            pass
+
+        # map doc_idx -> doc_id (from docs_meta)
+        try:
+            for i, meta in enumerate(getattr(bm25, "docs_meta", []) or []):
+                did = meta.get("doc_id") if isinstance(meta, dict) else None
+                if did is not None:
+                    doc_id_by_doc_idx[int(i)] = str(did)
+        except Exception:
+            doc_id_by_doc_idx = {}
+
+    # supervisor profiles
+    sup_profiles = None
+    if paths.supervisor_profiles_file.exists():
+        sup_profiles = read_json(paths.supervisor_profiles_file)
+
+    return {
+        "paths": paths,
+        "settings": settings,
+        "stopwords": stopwords,
+        "stem_mode": stem_mode,
+        "docs_by_id": docs_by_id,
+        "docs_by_url": docs_by_url,
+        "bm25": bm25,
+        "doc_id_by_doc_idx": doc_id_by_doc_idx,
+        "sup_profiles": sup_profiles,
+    }
+
+
+# =========================
+# Utility helpers
+# =========================
 def wa_share_url(text: str) -> str:
     return "https://wa.me/?text=" + urllib.parse.quote(text)
+
+
+def safe_text(x: Any) -> str:
+    return "" if x is None else str(x)
+
+
+def highlight_terms(text: str, terms: List[str]) -> str:
+    # reuse the safe HTML highlighter used for evidence
+    return _highlight_html(text, terms)
 
 
 def format_citation_apa(item: Dict[str, Any]) -> str:
@@ -211,23 +485,6 @@ def format_citation_ieee(item: Dict[str, Any]) -> str:
     return f'{authors}, "{title}," {year}{online}.'
 
 
-def highlight_terms(text: str, terms: List[str]) -> str:
-    """Escape HTML then bold matched terms with safe "word-ish boundary"."""
-    if not text:
-        return ""
-    out = html.escape(text)
-
-    uniq = {t.strip() for t in terms if isinstance(t, str) and len(t.strip()) >= 2}
-    for t in sorted(uniq, key=len, reverse=True):
-        # boundary: not letter/digit/underscore around term
-        pattern = re.compile(
-            rf"(?<![A-Za-z0-9_])({re.escape(t)})(?![A-Za-z0-9_])",
-            flags=re.IGNORECASE,
-        )
-        out = pattern.sub(r"<b>\1</b>", out)
-    return out
-
-
 def year_of(item: Dict[str, Any]) -> int:
     t = item.get("tanggal")
     if not t:
@@ -239,25 +496,15 @@ def year_of(item: Dict[str, Any]) -> int:
 
 
 def auto_cutoff_by_score(items: List[Dict[str, Any]], max_keep: int = 30) -> Tuple[List[Dict[str, Any]], float]:
-    """
-    Keep only relevant results automatically using a robust score threshold.
-    Strategy:
-    - sort desc by score
-    - compute median & MAD on top window
-    - threshold = max(score_at_k, median - 0.5*MAD) (clamped)
-    - keep items with score >= threshold, but at most max_keep.
-    Returns (filtered, threshold).
-    """
+    """Auto buang noise: keep hanya yang skornya masih masuk akal."""
     if not items:
         return [], 0.0
 
     ranked = sorted(items, key=lambda x: float(x.get("score", 0.0)), reverse=True)
 
-    # Always keep at least top 3 if exist
     top_window = ranked[: min(len(ranked), max_keep)]
     scores = [float(x.get("score", 0.0)) for x in top_window]
 
-    # robust stats
     s_sorted = sorted(scores)
     mid = len(s_sorted) // 2
     median = s_sorted[mid] if len(s_sorted) % 2 else (s_sorted[mid - 1] + s_sorted[mid]) / 2.0
@@ -265,20 +512,103 @@ def auto_cutoff_by_score(items: List[Dict[str, Any]], max_keep: int = 30) -> Tup
     ad_sorted = sorted(abs_dev)
     mad = ad_sorted[mid] if len(ad_sorted) % 2 else (ad_sorted[mid - 1] + ad_sorted[mid]) / 2.0
 
-    # knee-ish anchor from topK default: use score at 10th (or last)
     k_anchor = min(10, len(scores)) - 1
     score_at_k = scores[k_anchor]
 
     thr = max(score_at_k, median - 0.5 * mad)
-    # clamp to avoid insane cutoff if all low
     thr = max(thr, scores[min(2, len(scores) - 1)] * 0.60)
 
     filtered = [it for it in ranked if float(it.get("score", 0.0)) >= thr]
     return filtered[:max_keep], float(thr)
 
 
-def safe_text(x: Any) -> str:
-    return "" if x is None else str(x)
+ 
+
+
+# =========================
+# Recommendation runners (local)
+# =========================
+def run_citations_local(query: str, topk: int = 80) -> List[Dict[str, Any]]:
+    A = load_assets()
+    bm25 = A["bm25"]
+    if bm25 is None:
+        st.error("BM25 index belum ada. Jalankan pipeline indexing dulu sampai file indexes/bm25/index.pkl kebentuk.")
+        return []
+
+    stopwords = A["stopwords"]
+    stem_mode = A["stem_mode"]
+
+    # tokens for retrieval
+    q_tokens = preprocess_text(query, stopwords, stem_mode=stem_mode)
+
+    # terms for highlight: pakai token query asli (tanpa stemming agresif) biar kayak 'IHSG' kebaca
+    raw_terms = [w for w in _WORD_RE.findall(query) if len(w) >= 2]
+    raw_terms_lower = []
+    for w in raw_terms:
+        wl = w.lower()
+        if wl in stopwords:
+            continue
+        raw_terms_lower.append(w)
+
+    # initial retrieve for expansion (lebih banyak dulu)
+    initial = bm25_search(bm25, q_tokens, top_k=max(25, topk * 3), include_meta=True)
+
+    # query expansion from top docs (nambah konteks tanpa jadi ngaco)
+    try:
+        q_tokens2 = expand_query_from_top_docs(
+            A["docs_by_id"],
+            initial,
+            q_tokens,
+            max_expand=8,
+            top_docs=8,
+            idf=getattr(bm25, "idf", None),
+        )
+    except Exception:
+        q_tokens2 = q_tokens
+
+    # final recommend
+    results = recommend_citations(
+        bm25,
+        q_tokens2,
+        top_k=topk,
+        diversify=True,
+        original_query_tokens=q_tokens,
+    )
+
+    # explain + highlight
+    highlight_terms = []
+    for t in (raw_terms_lower + (q_tokens or [])):
+        tt = str(t).strip()
+        if tt and tt not in highlight_terms:
+            highlight_terms.append(tt)
+
+    results = _attach_explain(
+        results,
+        highlight_terms,
+        A["docs_by_id"],
+        A["docs_by_url"],
+        A["doc_id_by_doc_idx"],
+    )
+
+    return results
+
+
+def run_dosbing_local(query: str, topk: int = 10) -> List[Dict[str, Any]]:
+    A = load_assets()
+    sup_profiles = A["sup_profiles"]
+    if not sup_profiles:
+        st.error("Supervisor profiles belum ada. Jalankan pipeline profiling supaya data/processed/profiles/supervisors.json kebentuk.")
+        return []
+
+    stopwords = A["stopwords"]
+    stem_mode = A["stem_mode"]
+    q_tokens = preprocess_text(query, stopwords, stem_mode=stem_mode)
+
+    try:
+        return recommend_supervisors(sup_profiles, q_tokens, top_k=topk)
+    except Exception as e:
+        st.error(f"Gagal rekomendasi dosbing: {e}")
+        return []
 
 
 # =========================
@@ -286,33 +616,31 @@ def safe_text(x: Any) -> str:
 # =========================
 st.markdown("<h1>DINUS Research Recommendation</h1>", unsafe_allow_html=True)
 
-# Search box (no weird top spacing)
-with st.container():
-    c1, c2 = st.columns([6, 1], vertical_alignment="center")
-    with c1:
-        q = st.text_input(
-            "Query",
-            placeholder="Masukkan ide penelitian Anda...",
-            key="query",
-            label_visibility="collapsed",
-        )
-    with c2:
-        run = st.button("Cari", use_container_width=True)
+c1, c2 = st.columns([6, 1], vertical_alignment="center")
+with c1:
+    q = st.text_input(
+        "Query",
+        placeholder="Masukkan ide penelitian Anda...",
+        key="query",
+        label_visibility="collapsed",
+    )
+with c2:
+    run = st.button("Cari", use_container_width=True)
 
-    c3, c4, c5 = st.columns([2.0, 2.0, 3.0], vertical_alignment="center")
-    with c3:
-        show_dosbing = st.checkbox("Dosbing", value=True)
-    with c4:
-        show_sitasi = st.checkbox("Sitasi", value=True)
-    with c5:
-        sort_by = st.selectbox(
-            "Urutkan",
-            options=["Relevansi", "Tahun terbaru"],
-            index=0,
-            label_visibility="collapsed",
-        )
+c3, c4, c5 = st.columns([2.0, 2.0, 3.0], vertical_alignment="center")
+with c3:
+    show_dosbing = st.checkbox("Dosbing", value=True)
+with c4:
+    show_sitasi = st.checkbox("Sitasi", value=True)
+with c5:
+    sort_by = st.selectbox(
+        "Urutkan",
+        options=["Relevansi", "Tahun terbaru"],
+        index=0,
+        label_visibility="collapsed",
+    )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 # =========================
@@ -326,24 +654,20 @@ if "cutoff_info" not in st.session_state:
 
 
 # =========================
-# Search action
+# Search action (local)
 # =========================
 if run and q.strip():
     with st.spinner("Sistem sedang mencari..."):
-        dosbing_res = {"results": []}
-        sitasi_res = {"results": []}
+        dosbing_res: List[Dict[str, Any]] = []
+        sitasi_res: List[Dict[str, Any]] = []
 
         if show_dosbing:
-            dosbing_res = api_post("/recommend/supervisors", {"query": q, "topk": 10})
+            dosbing_res = run_dosbing_local(q, topk=10)
 
         if show_sitasi:
-            # request more, but UI will auto-cutoff
-            sitasi_res = api_post("/recommend/citations", {"query": q, "topk": 80})
+            sitasi_res = run_citations_local(q, topk=80)
 
-        st.session_state["results"] = {
-            "dosbing": dosbing_res.get("results", []),
-            "sitasi": sitasi_res.get("results", []),
-        }
+        st.session_state["results"] = {"dosbing": dosbing_res, "sitasi": sitasi_res}
         st.session_state["cutoff_info"] = {"thr": None}
 
 
@@ -352,7 +676,7 @@ sitasi_raw: List[Dict[str, Any]] = st.session_state["results"].get("sitasi", [])
 
 
 # =========================
-# Sorting Sitasi
+# Sorting Sitasi + Auto cutoff
 # =========================
 sitasi_sorted = sitasi_raw[:]
 if sort_by == "Tahun terbaru":
@@ -364,13 +688,12 @@ if sort_by == "Tahun terbaru":
 else:
     sitasi_sorted = sorted(sitasi_sorted, key=lambda x: float(x.get("score", 0.0)), reverse=True)
 
-# Auto cutoff (avoid showing unrelated noise)
 sitasi, thr = auto_cutoff_by_score(sitasi_sorted, max_keep=30)
 st.session_state["cutoff_info"] = {"thr": thr}
 
 
 # =========================
-# Render Dosbing (first)
+# Render Dosbing first
 # =========================
 if show_dosbing:
     st.markdown(
@@ -470,9 +793,10 @@ if show_sitasi:
         abs_html = safe_text(explain.get("abstract_html")).strip()
         matched_terms = explain.get("matched_terms") or item.get("matched_terms") or []
 
+        # fallback: kalau evidence belum ada, highlight seluruh abstrak
         if not abs_html:
             raw_abs = item.get("abstrak") or item.get("abstract") or ""
-            abs_html = highlight_terms(raw_abs, matched_terms)
+            abs_html = highlight_terms(str(raw_abs), [str(t) for t in (matched_terms or [])])
 
         chips = "".join([f'<span class="pill">{html.escape(str(t))}</span>' for t in matched_terms[:10]])
 
@@ -517,9 +841,10 @@ if show_sitasi:
                 "</div>"
             )
 
+        # open card (close after action row)
         st.markdown(f'<div class="card">{title_html}{meta_html}{abstrak_html}', unsafe_allow_html=True)
 
-        # Action row: Buka sumber, WhatsApp, Copy APA, Copy IEEE (one line)
+        # Action row: WhatsApp + Copy APA/IEEE (one line)
         st.markdown('<div class="btnRowInline">', unsafe_allow_html=True)
         b1, b2, b3 = st.columns([1.3, 1.3, 1.3], vertical_alignment="center")
 
@@ -534,6 +859,5 @@ if show_sitasi:
             with st.popover("Copy IEEE", use_container_width=True):
                 st.code(ieee, language=None)
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)  # close .card
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)  # close .card
