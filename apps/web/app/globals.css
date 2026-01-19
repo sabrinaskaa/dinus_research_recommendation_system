@@ -1,0 +1,65 @@
+:root { color-scheme: dark; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: #0b0f19;
+  color: #e8eaf2;
+}
+.container { max-width: 980px; margin: 0 auto; padding: 28px 18px 60px; }
+.card {
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px;
+  padding: 14px 14px;
+}
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.input {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+}
+.btn {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+}
+.btn:hover { background: rgba(255,255,255,0.12); }
+.tab {
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+.tabActive {
+  background: rgba(120,120,255,0.25);
+  border-color: rgba(120,120,255,0.45);
+}
+.muted { color: rgba(255,255,255,0.70); }
+.kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.25);
+}
+.pill {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-right: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+a { color: #b7c5ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 14px 0; }

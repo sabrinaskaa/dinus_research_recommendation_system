@@ -189,7 +189,8 @@ def recommend_citations(
       - explain (bm25 term contributions) if doc_idx available
     """
     # take wider candidate pool for rerank + diversify
-    base = bm25_search(index, query_tokens, top_k=top_k * 4)
+    docs_by_id = getattr(index, "docs_by_id", None)
+    base = bm25_search(index, query_tokens, top_k=top_k * 4, include_meta=True)
     qset = set([t.lower() for t in query_tokens if t])
 
     # enrich + rerank
