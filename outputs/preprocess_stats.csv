@@ -1,0 +1,2 @@
+vocab_size,avg_tokens_per_doc,median_tokens_per_doc,p95_tokens_per_doc
+5381,146.32124352331607,142.0,200.39999999999998

@@ -5,3 +5,5 @@ python-dotenv==1.0.1
 pyyaml==6.0.2
 Sastrawi==1.0.1
 scikit-learn
+streamlit
+requests
