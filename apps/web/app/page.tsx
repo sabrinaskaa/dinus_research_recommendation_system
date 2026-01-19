@@ -2,151 +2,183 @@
 
 import React, { useMemo, useState } from "react";
 import { recommendCitations, recommendSupervisors } from "../lib/api";
+import type { CitationItem, SupervisorItem } from "../lib/api";
 import { CitationCard, SupervisorCard } from "../components/ResultCard";
 
-type Tab = "citations" | "supervisors";
-
 export default function Page() {
-  const [tab, setTab] = useState<Tab>("citations");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
-  const [citations, setCitations] = useState<any>(null);
-  const [supervisors, setSupervisors] = useState<any>(null);
+  const [citationsRaw, setCitationsRaw] = useState<CitationItem[]>([]);
+  const [supervisors, setSupervisors] = useState<SupervisorItem[]>([]);
 
-  const canRun = useMemo(() => query.trim().length >= 2, [query]);
+  // UI controls (simple)
+  const [showDosbing, setShowDosbing] = useState(true);
+  const [showSitasi, setShowSitasi] = useState(true);
+  const [sortBy, setSortBy] = useState<"relevance" | "year_desc">("relevance");
 
-  async function run() {
-    if (!canRun) return;
+  // No pagination -> "Load more"
+  const [visibleCount, setVisibleCount] = useState(10);
+
+  async function onSearch() {
+    const q = query.trim();
+    if (q.length < 2) return;
+
     setLoading(true);
-    setErr(null);
+    setVisibleCount(10);
 
     try {
-      const [c, s] = await Promise.all([
-        recommendCitations(query.trim()),
-        recommendSupervisors(query.trim(), Math.min(20)),
+      // Dosbing dulu, sitasi berikutnya
+      const [sup, cit] = await Promise.all([
+        recommendSupervisors(q, 10),
+        recommendCitations(q, 50), // backend sudah auto-cutoff, ini cuma max cap internal
       ]);
-      setCitations(c);
-      setSupervisors(s);
-    } catch (e: any) {
-      setErr(e?.message || String(e));
+
+      setSupervisors(sup.results || []);
+      setCitationsRaw(cit.results || []);
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div className="container">
-      <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 20 }}>
-        Research Recommendation
-      </div>
+  const citationsSorted = useMemo(() => {
+    const xs = [...citationsRaw];
 
-      <div className="card">
-        <div className="row">
+    xs.sort((a, b) => {
+      if (sortBy === "year_desc") {
+        const ay = a.tanggal ? Number(String(a.tanggal).slice(0, 4)) : 0;
+        const by = b.tanggal ? Number(String(b.tanggal).slice(0, 4)) : 0;
+        if (by !== ay) return by - ay;
+      }
+      // relevance fallback
+      return (b.score ?? 0) - (a.score ?? 0);
+    });
+
+    return xs;
+  }, [citationsRaw, sortBy]);
+
+  const citationsVisible = useMemo(() => {
+    return citationsSorted.slice(0, visibleCount);
+  }, [citationsSorted, visibleCount]);
+
+  return (
+    <div style={{ maxWidth: 980, margin: "0 auto", padding: 16 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 900, marginBottom: 12 }}>
+        DINUS Research Recommendation
+      </h1>
+
+      {/* SEARCH BAR (clean) */}
+      <div className="searchCard">
+        <div className="searchRow">
           <input
-            className="input"
-            placeholder="Input topik riset atau ide penelitian Anda..."
+            className="searchInput"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            placeholder="Masukkan ide penelitian Anda..."
             onKeyDown={(e) => {
-              if (e.key === "Enter") run();
+              if (e.key === "Enter") onSearch();
             }}
           />
-        </div>
 
-        <div
-          className="row"
-          style={{ marginTop: 10, justifyContent: "space-between" }}
-        >
-          <div className="row">
-            <button
-              className={`tab ${tab === "citations" ? "tabActive" : ""}`}
-              onClick={() => setTab("citations")}
-            >
-              Sitasi
-            </button>
-            <button
-              className={`tab ${tab === "supervisors" ? "tabActive" : ""}`}
-              onClick={() => setTab("supervisors")}
-            >
-              Dosen
-            </button>
-          </div>
-
-          <button className="btn" onClick={run} disabled={!canRun || loading}>
-            {loading ? "Running..." : "Run"}
+          <button className="btnPrimary" onClick={onSearch} disabled={loading}>
+            {loading ? "Loading..." : "Cari"}
           </button>
         </div>
 
-        {err ? (
-          <div style={{ marginTop: 12, color: "#ffb4b4", fontSize: 13 }}>
-            Error: {err}
+        <div className="searchRow2">
+          <div className="leftControls">
+            <label className="checkItem">
+              <input
+                type="checkbox"
+                checked={showDosbing}
+                onChange={(e) => setShowDosbing(e.target.checked)}
+              />
+              <span>Dosbing</span>
+            </label>
+
+            <label className="checkItem">
+              <input
+                type="checkbox"
+                checked={showSitasi}
+                onChange={(e) => setShowSitasi(e.target.checked)}
+              />
+              <span>Sitasi</span>
+            </label>
           </div>
-        ) : null}
+
+          <div className="rightControls">
+            <span className="muted" style={{ fontSize: 12 }}>
+              Urutkan:
+            </span>
+            <select
+              className="select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              disabled={loading}
+            >
+              <option value="relevance">Relevansi</option>
+              <option value="year_desc">Tahun terbaru</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        {tab === "citations" ? (
-          <>
-            <div className="muted" style={{ marginBottom: 10 }}>
-              {citations?.tokens?.length ? (
-                <>
-                  Tokens:{" "}
-                  {citations.tokens.slice(0, 18).map((t: string) => (
-                    <span key={t} className="pill">
-                      {t}
-                    </span>
-                  ))}
-                </>
-              ) : null}
-              {citations?.expanded_tokens?.length ? (
-                <>
-                  <div style={{ marginTop: 8 }}>
-                    Expanded:{" "}
-                    {citations.expanded_tokens.slice(0, 18).map((t: string) => (
-                      <span key={t} className="pill">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              ) : null}
+      {/* DOSBING FIRST */}
+      {showDosbing ? (
+        <section style={{ marginTop: 18 }}>
+          <div className="sectionHeader">
+            <h2 className="sectionTitle">Rekomendasi Dosbing</h2>
+            <div className="muted" style={{ fontSize: 12 }}>
+              {supervisors.length ? `${supervisors.length} kandidat` : ""}
             </div>
+          </div>
 
-            {citations?.results?.length ? (
-              citations.results.map((it: any, idx: number) => (
-                <CitationCard key={it.doc_id || idx} item={it} />
-              ))
-            ) : (
-              <div className="muted">Belum ada hasil. Klik Run.</div>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="muted" style={{ marginBottom: 10 }}>
-              {supervisors?.tokens?.length ? (
-                <>
-                  Tokens:{" "}
-                  {supervisors.tokens.slice(0, 18).map((t: string) => (
-                    <span key={t} className="pill">
-                      {t}
-                    </span>
-                  ))}
-                </>
-              ) : null}
+          {supervisors.length ? (
+            supervisors.map((s, idx) => (
+              <SupervisorCard key={`${s.dosen}-${idx}`} item={s} />
+            ))
+          ) : (
+            <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>
+              Belum ada hasil. Coba cari dulu.
             </div>
+          )}
+        </section>
+      ) : null}
 
-            {supervisors?.results?.length ? (
-              supervisors.results.map((it: any, idx: number) => (
-                <SupervisorCard key={it.dosen || idx} item={it} />
-              ))
-            ) : (
-              <div className="muted">Belum ada hasil. Klik Run.</div>
-            )}
-          </>
-        )}
-      </div>
+      {/* CITATIONS NEXT */}
+      {showSitasi ? (
+        <section style={{ marginTop: 22 }}>
+          <div className="sectionHeader">
+            <h2 className="sectionTitle">Rekomendasi Sitasi</h2>
+            <div className="muted" style={{ fontSize: 12 }}>
+              {citationsSorted.length ? `${citationsSorted.length} hasil` : ""}
+            </div>
+          </div>
+
+          {citationsVisible.length ? (
+            <>
+              {citationsVisible.map((c, idx) => (
+                <CitationCard key={`${c.doc_id}-${idx}`} item={c} />
+              ))}
+
+              {citationsVisible.length < citationsSorted.length ? (
+                <div style={{ marginTop: 12 }}>
+                  <button
+                    className="btnPrimary"
+                    onClick={() => setVisibleCount((v) => v + 10)}
+                  >
+                    Load more (+10)
+                  </button>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>
+              Belum ada hasil. Coba cari dulu.
+            </div>
+          )}
+        </section>
+      ) : null}
     </div>
   );
 }

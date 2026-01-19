@@ -1,15 +1,40 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import type { CitationItem, SupervisorItem } from "../lib/api";
+import {
+  buildWhatsAppShareText,
+  copyToClipboard,
+  formatCitationAPA,
+  formatCitationIEEE,
+} from "../lib/citation";
 
 export function CitationCard({ item }: { item: CitationItem }) {
   const absHtml = item.explain?.abstract_html || "";
   const matched = item.explain?.matched_terms || [];
 
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const waLink = useMemo(() => {
+    const text = buildWhatsAppShareText(item);
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  }, [item]);
+
+  async function onCopy(style: "apa" | "ieee") {
+    const txt =
+      style === "apa" ? formatCitationAPA(item) : formatCitationIEEE(item);
+    await copyToClipboard(txt);
+    setCopied(style);
+    window.setTimeout(() => setCopied(null), 1200);
+  }
+
   return (
     <div className="card" style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
-        {item.judul || "(Tanpa judul)"}
-      </div>
+      {item.url ? (
+        <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.25 }}>
+          <a href={item.url} target="_blank" rel="noreferrer">
+            {item.judul || "(Tanpa judul)"}
+          </a>
+        </div>
+      ) : null}
 
       <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>
         <span className="kbd">score</span> {item.score.toFixed(4)}
@@ -22,16 +47,22 @@ export function CitationCard({ item }: { item: CitationItem }) {
         {"  "}
         {item.tanggal ? <>• {item.tanggal}</> : null}
         {item.source ? <> • {item.source}</> : null}
-        {typeof item.doc_idx === "number" ? <> • idx:{item.doc_idx}</> : null}
       </div>
 
-      {item.url ? (
-        <div style={{ marginTop: 6, fontSize: 13 }}>
-          <a href={item.url} target="_blank" rel="noreferrer">
-            Buka sumber
-          </a>
-        </div>
-      ) : null}
+      {/* Actions */}
+      <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <a className="btn" href={waLink} target="_blank" rel="noreferrer">
+          Share WhatsApp
+        </a>
+
+        <button className="btn" onClick={() => onCopy("apa")}>
+          Copy sitasi (APA){copied === "apa" ? " ✓" : ""}
+        </button>
+
+        <button className="btn" onClick={() => onCopy("ieee")}>
+          Copy sitasi (IEEE){copied === "ieee" ? " ✓" : ""}
+        </button>
+      </div>
 
       {/* Abstrak evidence */}
       {absHtml ? (
@@ -86,7 +117,7 @@ export function SupervisorCard({ item }: { item: SupervisorItem }) {
       {item.matched_terms?.length ? (
         <div style={{ marginTop: 10 }}>
           <div className="muted" style={{ fontSize: 12 }}>
-            Alasan muncul (matched terms):
+            Cocok dengan:
           </div>
           {item.matched_terms.map((t) => (
             <span key={t} className="pill">

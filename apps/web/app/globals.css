@@ -113,3 +113,102 @@ hr {
   background: rgba(120, 120, 255, 0.18);
   border: 1px solid rgba(120, 120, 255, 0.22);
 }
+/* Search card */
+.searchCard {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+/* Row 1: input + button */
+.searchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 260px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.16);
+  color: inherit;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Row 2: toggles + sort */
+.searchRow2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.leftControls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.checkItem {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  user-select: none;
+}
+
+.rightControls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Buttons & selects (match your vibe) */
+.btnPrimary {
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.select {
+  padding: 9px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.14);
+  color: inherit;
+}
+
+/* Section header */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+}
