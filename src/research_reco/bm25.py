@@ -91,7 +91,6 @@ def build_bm25_index(
     for t, df in vocab_df.items():
         idf[t] = math.log(1 + (N - df + 0.5) / (df + 0.5)) if N else 0.0
 
-    # safety: docs_meta length must match docs_tokens length
     if len(docs_meta) != N:
         raise ValueError(f"docs_meta length ({len(docs_meta)}) must match docs_tokens length ({N})")
 

@@ -159,15 +159,6 @@ def recommend_supervisors(
     anchor_idf_min: float = 0.65,
     generic_downweight: float = 0.35,
 ) -> List[Dict[str, Any]]:
-    """
-    Recommend dosen based on cosine similarity between query TF-IDF vector
-    and each dosen profile vector.
-
-    Fix utama:
-      1) Anchor gating (term spesifik) biar gak nyasar karena kata generik
-      2) Downweight kata generik
-      3) Threshold + relative cutoff biar score kecil banget kebuang
-    """
     idf: Dict[str, float] = profiles_obj.get("idf", {}) or {}
     profiles: Dict[str, Any] = profiles_obj.get("profiles", {}) or {}
 

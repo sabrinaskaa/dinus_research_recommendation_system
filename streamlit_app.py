@@ -1,6 +1,3 @@
-# streamlit_app.py
-# Streamlit-only version: recommendation logic runs locally (no FastAPI backend).
-
 from __future__ import annotations
 
 import html
