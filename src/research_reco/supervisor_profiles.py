@@ -5,10 +5,6 @@ import math
 from collections import defaultdict
 from typing import Dict, List, Any, Tuple
 
-
-# Kata-kata super umum yang sering bikin rekomendasi dosen "nyasar".
-# Ini bukan stopword bahasa Indonesia biasa, tapi "generic research words".
-# Kita TURUNKAN bobotnya supaya query seperti "machine learning" tidak
 # otomatis mengangkat dosen yang domainnya beda jauh.
 GENERIC_TERMS = {
     # Indo
