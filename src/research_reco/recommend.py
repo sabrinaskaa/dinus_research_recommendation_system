@@ -45,10 +45,6 @@ def recommend_citations(
     diversify: bool = True,
     original_query_tokens: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]]:
-    """
-    Return citation recommendations with automatic relevance cutoff.
-    - top_k is the MAX cap, not forced output size.
-    """
     # pull more candidates than needed
     candidate_k = max(30, top_k * 5)
 
