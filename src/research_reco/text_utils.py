@@ -7,9 +7,9 @@ try:
     from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
     from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
     _HAS_SASTRAWI = True
-except ModuleNotFoundError:  # optional dependency
-    StemmerFactory = None  # type: ignore
-    StopWordRemoverFactory = None  # type: ignore
+except ModuleNotFoundError:
+    StemmerFactory = None
+    StopWordRemoverFactory = None
     _HAS_SASTRAWI = False
 
 _WORD_RE = re.compile(r"[a-zA-Z0-9_]+", re.UNICODE)

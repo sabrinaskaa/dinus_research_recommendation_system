@@ -169,7 +169,6 @@ def recommend_supervisors(
             continue
         qtf[t] += 1
 
-    # Anchor terms: pilih term query paling spesifik (idf tinggi), non-generic.
     q_terms_unique = list(qtf.keys())
     anchor_candidates = [t for t in q_terms_unique if t in idf and t not in GENERIC_TERMS]
     anchor_candidates.sort(key=lambda t: float(idf.get(t, 0.0)), reverse=True)
