@@ -41,27 +41,6 @@ def _safe_log1p(x: float) -> float:
 
 
 def build_supervisor_profiles(processed_docs: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Build supervisor profiles ONLY from source == "dosbing" and dosen != None.
-
-    Treat each DOSEN as one "document" for DF/IDF across dosen.
-    Vector weighting: (1 + log(1 + tf)) * idf
-
-    Returns:
-      {
-        "idf": {term: idf, ...},
-        "profiles": {
-            "<dosen_name>": {
-                "vector": {term: weight, ...},
-                "norm": float,
-                "top_terms": [t1..],
-                "samples": [{doc_id, judul, tanggal, url}, ...],
-                "pub_count": int
-            }
-        },
-        "meta": {"dosen_count": int, "doc_count": int}
-      }
-    """
     # filter dosbing docs
     dosen_docs = [
         d for d in processed_docs
