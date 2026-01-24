@@ -1,4 +1,3 @@
-# src/research_reco/recommend.py
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
@@ -23,13 +22,6 @@ def _percentile(xs: List[float], p: float) -> float:
 
 
 def _auto_cutoff(scores: List[float]) -> float:
-    """
-    Dynamic cutoff so TopK doesn't force low-relevance junk.
-    Strategy:
-      - max_ratio = 0.65 of best score
-      - p75 = 75th percentile
-      - cutoff = max(max_ratio, p75)
-    """
     if not scores:
         return float("inf")
     mx = max(scores)

@@ -73,7 +73,7 @@ def main():
 
         # Build text_for_index with optional field boosting
         if use_boost:
-            text_for_index = build_boosted_text_for_index(  # type: ignore
+            text_for_index = build_boosted_text_for_index(  
                 judul,
                 keyword,
                 abstrak,
