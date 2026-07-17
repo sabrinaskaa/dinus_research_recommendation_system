@@ -5,5 +5,7 @@ python-dotenv==1.0.1
 pyyaml==6.0.2
 Sastrawi==1.0.1
 scikit-learn
-streamlit
+streamlit==1.59.2
 requests
+starlette==0.46.2
+rich==15.0.0
